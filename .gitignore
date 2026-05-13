@@ -1,0 +1,25 @@
+# Local/editor files
+.DS_Store
+Thumbs.db
+*.tmp
+*.bak
+*.swp
+
+# Logs and generated outputs
+*.log
+coverage/
+dist/
+build/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+*.local
+*.local.*
+
+# Agent-local state
+.sdlc/state.json
+planning-private/
+private/
+.publication-denylist.local.txt

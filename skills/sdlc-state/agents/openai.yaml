@@ -1,0 +1,4 @@
+interface:
+  display_name: "SDLC State"
+  short_description: "Maintain compact SDLC state"
+  default_prompt: "Use the sdlc-state skill to create or update a compact .sdlc/state.json execution index without replacing planning artifacts, independent reviews, verification gates, or progress docs. Keep state small, structured, and resumable."

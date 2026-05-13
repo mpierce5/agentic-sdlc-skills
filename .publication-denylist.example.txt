@@ -1,0 +1,8 @@
+# Copy this file to .publication-denylist.local.txt and add private terms.
+# The local denylist is ignored by git.
+#
+# Examples:
+# your-local-username
+# your-product-name
+# your-private-domain.example
+# your-review-account-file
