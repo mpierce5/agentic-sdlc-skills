@@ -20,7 +20,7 @@ Use this skill after the functional plan is reviewed.
 - explicitly state what deprecated paths will be removed
 - explicitly state what migration scripts and compatibility layers are intentionally not being created
 - write or update the technical plan in the repo planning artifact
-- commit technical-plan doc changes before leaving this phase
+- commit technical-plan doc changes before leaving this phase when the repo workflow permits commits; otherwise report the blocker and dirty doc paths
 - on every material technical-plan iteration, run both a TPM review pass and an architect review pass before moving on
 - reuse the same refinement-wave TPM and architect reviewers by default instead of spawning fresh planning reviewers each iteration
 - if the refinement reviewers already exist from earlier phases, send the technical-plan delta to those same reviewers instead of spawning new reviewers
@@ -45,9 +45,11 @@ Technical AC should cover applicable:
 
 Every Technical AC must be precise enough for an architect reviewer to check against a diff, targeted tests, and affected files without re-deriving the intended architecture.
 
+Each Technical AC must name the boundary where signoff must happen. For example, if the AC promises provider model selection, API route behavior, persistence, notification delivery, billing effect, sync outcome, FE/backend contract behavior, or permission enforcement, the AC must require service/API-level, integration, or end-to-end proof rather than only helper-level proof unless a reviewer explicitly accepts narrower proof and records why.
+
 ## Planning Artifact Commit
 
-If this phase creates or updates repo docs, commit those doc changes before exiting the phase.
+If this phase creates or updates repo docs, commit those doc changes before exiting the phase when the repo workflow permits commits.
 
 - check the worktree before editing and note unrelated existing changes
 - stage only the technical-plan docs touched by this phase
@@ -68,4 +70,5 @@ If this phase creates or updates repo docs, commit those doc changes before exit
 - delegated technical-plan review records the model used and whether the persistent refinement reviewer was reused or replaced
 - any still-supported external contract that constrains the wave is named explicitly
 - any forbidden state or cross-boundary behavior discovered during technical planning is captured as Technical AC or Negative AC before execution planning begins
+- Technical AC are explicit enough to become final AC verification matrix rows with exact expected behavior, proof depth, and reviewer signoff status
 - technical-plan doc changes are committed, or an explicit blocker is reported with the dirty doc paths

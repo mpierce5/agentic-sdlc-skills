@@ -78,9 +78,28 @@ Treat this workflow as gated, not advisory.
 - do not start execution planning until the technical plan has been independently reviewed and updated
 - do not start implementation until the execution plan has been independently reviewed, updated, committed, and accepted
 - do not start the next risky slice until the previous slice is review-clean, verified, and committed, or findings are explicitly accepted as no-fix or deferred
+- do not mark an AC checked, review-clean, or signed off when the proof covers only an intermediate implementation detail and not the expected product or technical behavior named by the AC
+- do not call the wave complete until the final AC verification matrix is filled in and all blocking or partial rows are fixed, explicitly accepted as no-fix, or explicitly deferred by the user or required reviewer
 - if the user explicitly asks to skip a gate, record the skipped gate and reason in the checklist and planning artifact
 
 When in doubt, stop and ask the user instead of silently advancing.
+
+## AC Signoff Standard
+
+The AC trace table is planning traceability. It is not final signoff.
+
+Every implementation wave must maintain a final AC verification matrix that is updated during slice closeout and completed at the final acceptance gate. Each AC row must record:
+
+- AC id and type: Product AC, Technical AC, or Negative AC
+- exact expected behavior in outcome terms
+- concrete proof/test, including the command, browser/API check, contract test, or review evidence
+- proof level: `behavior/API/service`, `contract`, `unit/helper`, `visual`, or `manual`
+- reviewer signoff status: `signed-off`, `partial`, `blocked`, `deferred`, or `not applicable`
+- unchecked/deferred notes and the owner or follow-up gate
+
+Reviewers must mark AC coverage `partial` or `blocked` when the proof validates only an intermediate signal, such as a route label, helper return value, mock call, CSS class, or local state transition, but the AC promises a cross-module, service/API, provider, persistence, model-selection, permission, billing, notification, or user-visible outcome.
+
+When an AC crosses module boundaries, final proof must include service/API-level or end-to-end behavior at that boundary unless the execution plan explicitly justifies why a narrower proof is sufficient.
 
 ## Documentation And State
 
@@ -94,6 +113,7 @@ Before implementation starts, the current planning artifact must capture:
 - architecture or technical decisions
 - slice-by-slice execution plan
 - explicit test and verification plan
+- final AC verification matrix separate from the trace table, with exact expected behavior, proof/test, reviewer signoff status, and unchecked or deferred notes for every Product AC, Technical AC, and Negative AC row
 - out-of-scope items
 - current risks, guardrails, and open defects relevant to the wave
 - progress tracking that can be updated during implementation
@@ -124,6 +144,8 @@ Cache stable context in repo artifacts when it will be reused. Pass compact refe
 
 ## Model And Agent Policy
 
+Invoking `$sdlc` is standing explicit permission to spawn, reuse, message, wait on, and close the separate reviewer agents required by this workflow. Do not pause to ask for additional permission before creating TPM, architect, specialist, execution-plan, or slice-review agents unless the requested reviewer would modify live production systems or perform another action that independently requires user approval.
+
 Use the model tiers defined by the active adapter or repo-local instructions:
 
 - `economy-review`
@@ -131,6 +153,8 @@ Use the model tiers defined by the active adapter or repo-local instructions:
 - `frontier-review`
 
 The coordinator decides which role needs review and which checklist item the review satisfies. The detailed model-tier selection, review scope, review-agent lifecycle, and escalation behavior belong to `$execution-plan` and `$slice-review`.
+
+The implementation agent still must not be the only reviewer of its own work. Treat reviewer-agent spawning permission as authorization to satisfy the independent review gate, not as permission to skip it, self-review, or weaken AC signoff standards.
 
 If independent review tooling is unavailable, use a separate fresh reviewer session or a human reviewer and record that fact plainly in the planning/progress artifact.
 

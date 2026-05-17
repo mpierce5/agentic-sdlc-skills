@@ -21,7 +21,7 @@ Use this skill only for discovery and alignment. Do not plan implementation and 
 - do not close the refinement reviewers at the end of discovery; keep them open for Phase 0, functional-plan, technical-plan, and execution-plan review unless replacement is explicitly justified
 - when delegated review tooling is available, use `frontier-review` for both the TPM reviewer and the architect reviewer during refinement
 - do not begin planning or coding until the user has confirmed the refined problem statement, Product AC, and Negative AC, unless the user explicitly says to proceed with stated assumptions
-- if this phase creates or updates a repo requirements/checkpoint doc, commit those doc changes before leaving discovery
+- if this phase creates or updates a repo requirements/checkpoint doc, commit those doc changes before leaving discovery when the repo workflow permits commits; otherwise report the blocker and dirty doc paths
 - keep discovery output concise: ask only the smallest set of questions needed, avoid explaining each question, and end with a compact checkpoint instead of a long recap
 
 ## Required Output
@@ -37,9 +37,11 @@ Produce a requirements checkpoint the user can approve:
 
 Do not leave acceptance criteria as general intent. Each Product AC and Negative AC should be phrased as a pass/fail statement that a TPM or acceptance reviewer can verify without reinterpreting the feature.
 
+Each AC should name the outcome that must eventually be proven. If the intended behavior crosses a service/API, provider, persistence, FE/backend, model-selection, permission, billing, notification, scheduler, sync, or user-visible boundary, write the AC so helper-level or label-level proof cannot be mistaken for final signoff.
+
 ## Planning Artifact Commit
 
-If discovery creates or updates repo docs, commit those doc changes before exiting the phase.
+If discovery creates or updates repo docs, commit those doc changes before exiting the phase when the repo workflow permits commits.
 
 - check the worktree before editing and note unrelated existing changes
 - stage only the requirements/checkpoint docs touched by this phase
@@ -54,6 +56,7 @@ If discovery creates or updates repo docs, commit those doc changes before exiti
 - the user has seen the refined problem statement
 - the user has seen the proposed Product AC and Negative AC
 - any known Technical AC notes are either captured for technical planning or explicitly marked unresolved
+- AC are outcome-level enough to become final AC verification matrix rows later, not just implementation notes or internal labels
 - any material refinement iteration has had both TPM and architect review passes, or an explicit blocker is reported
 - the user has confirmed them or explicitly asked you to proceed with named assumptions
 - any requirements/checkpoint doc changes are committed, or an explicit blocker is reported with the dirty doc paths

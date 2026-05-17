@@ -13,7 +13,7 @@ Use this skill after requirements, Product AC, and Negative AC are confirmed.
 - define the desired user outcome, scope, out-of-scope boundaries, Product AC, Negative AC, UX-critical flows, edge cases, and high-level test plan
 - make the plan reflect the current implementation, not assumptions
 - write or update the functional plan in the repo planning artifact when this phase is part of an SDLC wave
-- commit functional-plan doc changes before leaving this phase
+- commit functional-plan doc changes before leaving this phase when the repo workflow permits commits; otherwise report the blocker and dirty doc paths
 - if the work is UX-facing, think like a principal product designer and frontend architect
 - on every material functional-plan iteration, run both a TPM review pass and an architect review pass before moving on
 - reuse the same refinement-wave TPM and architect reviewers by default instead of spawning fresh planning reviewers each iteration
@@ -34,9 +34,11 @@ The functional plan must separate:
 
 Each Product AC and Negative AC must be phrased as a pass/fail check. Do not bury acceptance criteria in narrative paragraphs.
 
+Each Product AC and Negative AC must also name the observable outcome that will later be signed off. Avoid AC phrasing that can be satisfied by an internal label, helper result, or mock when the intended promise is a user-visible, API/service, persistence, permission, notification, billing, sync, or provider-facing behavior.
+
 ## Planning Artifact Commit
 
-If this phase creates or updates repo docs, commit those doc changes before exiting the phase.
+If this phase creates or updates repo docs, commit those doc changes before exiting the phase when the repo workflow permits commits.
 
 - check the worktree before editing and note unrelated existing changes
 - stage only the functional-plan docs touched by this phase
@@ -54,5 +56,6 @@ If this phase creates or updates repo docs, commit those doc changes before exit
 - every material functional-plan iteration has had both TPM and architect review passes, or an explicit blocker is reported
 - any delegated review records the model used and whether the persistent refinement reviewer was reused or replaced
 - open questions that affect scope, Product AC, or Negative AC are resolved or explicitly marked for follow-up
-- Product AC and Negative AC are explicit enough to become trace-table rows during execution planning
+- Product AC and Negative AC are explicit enough to become trace-table rows and final AC verification matrix rows during execution planning
+- Product AC and Negative AC name outcome-level behavior clearly enough that reviewers can reject proof that covers only an intermediate implementation detail
 - functional-plan doc changes are committed, or an explicit blocker is reported with the dirty doc paths

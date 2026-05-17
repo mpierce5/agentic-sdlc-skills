@@ -20,6 +20,8 @@ When a parent agent delegates review to a sub-agent, the prompt should explicitl
 - do not analyze broad diff stats, full branch history, or large tool outputs unless a failure or uncertainty specifically requires that expansion
 - run one combined review focused on correctness, acceptance-criteria drift, maintainability, and whether the slice still matches the approved plan and architecture intent
 - validate the slice against the compact AC/TAC packet supplied by the parent agent: Product AC rows, Technical AC rows, Negative AC rows, trace-table mappings, planned tests, affected files, and forbidden states
+- validate the slice against the final AC verification matrix rows supplied by the parent agent; do not treat trace-table coverage as signoff
+- mark AC coverage `partial` or `blocked` when the supplied proof validates only intermediate implementation behavior and not the exact behavior promised by the AC
 - when using review sub-agents, pass explicit model-tier and reasoning-depth values when the agent platform supports them instead of inheriting the implementation agent's model by default
 - reuse the same-run combined reviewer when appropriate; do not spawn unlimited fresh review agents
 - log concrete findings
@@ -32,7 +34,7 @@ Use the lightest review mode that still protects correctness.
 
 - `SHALLOW`: default per-slice review; diff-first, focused correctness check, mandatory AC/TAC trace validation for assigned rows, and top findings only
 - `DEEP`: escalated review; expanded context, stronger architecture or contract validation, broader correctness sweep
-- `ACCEPTANCE`: full acceptance gate; full acceptance-criteria validation, architecture review, correctness sweep, and UX review when applicable
+- `ACCEPTANCE`: full acceptance gate; full acceptance-criteria validation using the final AC verification matrix, architecture review, correctness sweep, and UX review when applicable
 
 `SHALLOW` is the routine slice-review mode. `DEEP` and `ACCEPTANCE` are explicit escalations, not the default for every slice.
 
@@ -83,6 +85,7 @@ Use the narrowest context that can produce a correct review.
 - if a changed file calls into another module, inspect the callee only when the diff creates a concrete correctness, contract, or ownership question
 - the combined reviewer may use the relevant plan excerpt and assigned Product AC, Technical AC, Negative AC, and trace rows, but should still avoid full planning docs unless a concrete ambiguity requires them
 - the combined reviewer must use the assigned AC/TAC packet before calling the slice clean; if the packet is missing or too vague to validate, return a blocking finding instead of guessing
+- the combined reviewer must use the assigned final AC verification matrix rows before calling AC coverage complete; if expected behavior, required proof depth, or proof evidence is missing, return a blocking finding instead of inferring signoff from nearby tests
 - broad repo exploration is an escalation, not a default
 - record any scope expansion in the review result, for example `scope: diff-only`, `scope: changed-files`, or `scope: expanded-to-contract`
 
@@ -105,8 +108,10 @@ Use cached context before requesting raw context.
 Use terse findings-only output by default.
 
 - Always include one compact metadata line before findings:
-  `scope: <diff-only|changed-files|expanded-to-contract>; model: <model>; AC coverage: <complete|partial|blocked|not applicable>; unchecked AC: <ids|none>`
+  `scope: <diff-only|changed-files|expanded-to-contract>; model: <model>; AC coverage: <complete|partial|blocked|not applicable>; unchecked AC: <ids|none>; AC signoff: <signed-off|partial|blocked|deferred|not applicable>`
 - If AC coverage is `partial` or `blocked`, include a finding that names the uncovered Product AC, Technical AC, or Negative AC row.
+- If AC signoff is `partial` or `blocked`, include a finding that names the AC row and explains the gap between the available proof and the exact expected behavior.
+- Do not sign off an AC based only on route labels, helper return values, mocks, CSS selectors, local state labels, or object-shape checks when the AC promises provider model selection, API/service behavior, persistence, permissions, billing, notification delivery, sync behavior, or user-visible outcome.
 - output bullet issues only
 - include no prose summary unless there are zero findings
 - each finding should be one bullet with severity, file/path or symbol, and the concrete problem
@@ -142,6 +147,7 @@ Default lifecycle for one SDLC run:
 - reuse an idle combined reviewer for later slices in the same SDLC run
 - pass a compact new prompt for each slice: current diff or commit, changed files, relevant plan excerpt, verification status (`pending` before the review/fix loop is clean, or results after verification), unresolved prior findings if relevant, and review rubric
 - every compact new prompt must include the assigned Product AC, Technical AC, Negative AC, trace-table rows, planned tests, affected files, forbidden states, and expected AC coverage verdict for the slice
+- every compact new prompt must include assigned final AC verification matrix rows, exact expected behavior, required proof depth, current proof/test evidence, and requested signoff status
 - tell a reused reviewer to treat the prompt as a fresh review of the named diff or commit
 - spawn a new reviewer without full-context forking only when no same-role reviewer exists, the existing reviewer is busy, the existing reviewer should be closed, or the slice requires fresh independence
 - before spawning, close idle review agents that are no longer needed
@@ -172,6 +178,7 @@ Record in the review result:
 - review model and reasoning effort
 - escalation reason, or `none`
 - AC coverage verdict: `complete`, `partial`, `blocked`, or `not applicable`
+- AC signoff verdict for matrix rows: `signed-off`, `partial`, `blocked`, `deferred`, or `not applicable`
 - unchecked or deferred AC ids, or `none`
 - reviewer lifecycle: `reused` or `fresh`, whether same-slice follow-up was needed, and whether the reviewer was closed after resolution
 - compact-context source used for the review

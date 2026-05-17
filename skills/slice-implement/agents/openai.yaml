@@ -1,4 +1,4 @@
 interface:
   display_name: "Slice Implement"
   short_description: "Implement and commit exactly one slice"
-  default_prompt: "Use the slice-implement skill to implement exactly one reviewed execution-plan slice with tests first, targeted verification, prerelease cleanup posture, and an immediate commit when the slice is green. Before coding, identify the slice's Product AC, Technical AC, Negative AC, trace-table rows, affected files, planned tests, and expected AC coverage verdict; pass that compact AC/TAC packet to slice-review and record the reviewer's AC coverage verdict before committing."
+  default_prompt: "Use the slice-implement skill to implement exactly one reviewed execution-plan slice with tests first, targeted verification, prerelease cleanup posture, and an immediate commit when the slice is green. Before coding, identify the slice's Product AC, Technical AC, Negative AC, trace-table rows, final AC verification matrix rows, affected files, planned tests, required proof depth, and expected AC coverage verdict; pass that compact AC/TAC and AC-signoff packet to slice-review. Update the final AC verification matrix before committing."

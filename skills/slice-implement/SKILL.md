@@ -13,6 +13,7 @@ Use this skill for exactly one slice at a time.
 - keep coding in the primary implementation agent by default; do not spawn a separate coding agent unless the task is isolated, non-critical-path, and has a clear disjoint write scope
 - write or update the planned failing tests first
 - before coding, identify the slice's assigned Product AC, Technical AC, Negative AC, trace-table rows, and expected AC coverage verdict from the execution plan
+- before coding, identify the slice's final AC verification matrix rows, exact expected behavior, required proof depth, and current signoff status
 - implement the smallest coherent change for the slice
 - reuse valid cached file summaries, plan excerpts, and prior test results from the active planning/progress artifact instead of re-reading unchanged files or logs
 - refresh only stale cache entries whose source files, commands, or commits changed
@@ -24,6 +25,7 @@ Use this skill for exactly one slice at a time.
 - run focused checks before routine slice review when they help tighten the next review/fix loop
 - run one combined slice review before slice-level targeted verification
 - pass the combined reviewer the compact AC/TAC packet for this slice rather than only a general plan excerpt
+- pass the combined reviewer the final AC verification matrix rows for this slice, including expected behavior, required proof depth, proof evidence, and any unchecked/deferred notes
 - fix review findings and re-review with the same reviewers until there are no blocking findings, findings are accepted as no-fix, or findings are explicitly deferred
 - after the review/fix loop is clean, run only the narrowest meaningful targeted verification for this slice unless this slice is explicitly marked as the final slice or a wave-level verification gate
 - do not run the full repo suite, broad regression set, or wave-level verification on intermediate slices unless the execution plan explicitly marks that slice as the verification gate
@@ -33,6 +35,7 @@ Use this skill for exactly one slice at a time.
 - do not batch multiple slices into one commit
 - after committing, record the `$slice-review` results and use the review model tiers recorded in the execution plan instead of allowing review sub-agents to inherit the implementation model
 - record the reviewer's AC coverage verdict: `complete`, `partial`, `not applicable`, or `blocked`, plus any uncovered AC ids and follow-up gate
+- update the final AC verification matrix for rows owned by the slice; mark rows `signed-off` only when proof reaches the expected behavior and required proof depth, otherwise mark `partial`, `blocked`, or `deferred` with notes
 - while review sub-agents run, continue with review-independent prep named in the execution plan when it is safe; do not start or commit the next risky slice until prior review findings are resolved, accepted as no-fix, or explicitly deferred
 - in prerelease work, do not add migration scripts or compatibility code unless the user explicitly asks for them or a still-supported contract truly requires them
 - prefer removing deprecated code over extending it
@@ -50,6 +53,7 @@ Focused checks during coding are expected. Broad verification is deliberately de
 - keep browser or Playwright verification to one clean pass per target view by default; repeat only if the first pass fails or code changed again
 - if targeted verification fails, fix the failure, then return to review/fix before rerunning targeted verification when the fix materially changes product code, contracts, tests, or architecture
 - if a verification fix is purely mechanical and cannot affect behavior, rerun only the failed verification first, then widen as needed
+- targeted verification must prove the AC's expected behavior, not just an intermediate label or helper result, whenever the AC crosses service/API, provider, persistence, model-selection, FE/backend, auth, billing, notification, scheduler, sync, or user-visible boundaries
 
 ## Review Concurrency
 
@@ -82,6 +86,7 @@ Do not use state to skip required combined slice review, targeted slice verifica
 - that slice has its own commit
 - verification for that slice is recorded after the review/fix loop
 - AC coverage verdict is recorded with Product AC, Technical AC, and Negative AC rows that were checked or intentionally deferred
+- final AC verification matrix rows owned by the slice are updated with proof/test, proof depth, reviewer signoff status, and unchecked/deferred notes
 - updated test-result and file-summary cache entries are recorded when relevant
 - the combined review result is recorded with the explicit planned review model
 - any concurrent prep is recorded and does not stack a risky commit ahead of review resolution

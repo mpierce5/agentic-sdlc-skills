@@ -123,7 +123,7 @@ Produce a written Phase 0 assessment in chat or the active repo planning artifac
 
 ## Planning Artifact Commit
 
-If Phase 0 creates or updates repo docs, commit those doc changes before exiting the phase.
+If Phase 0 creates or updates repo docs, commit those doc changes before exiting the phase when the repo workflow permits commits.
 
 - check the worktree before editing and note unrelated existing changes
 - stage only the Phase 0 planning docs touched by this phase

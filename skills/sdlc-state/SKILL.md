@@ -36,7 +36,8 @@ Default path: `.sdlc/state.json` unless the repo defines another path.
     "files_changed_count": 0,
     "last_commit": "sha | null",
     "review_status": "pending | blocking_findings | review_clean | deferred | no_fix",
-    "verification_status": "not_run | focused_passed | broad_passed | failed"
+    "verification_status": "not_run | focused_passed | broad_passed | failed",
+    "ac_signoff_status": "unchecked | partial | blocked | signed-off | deferred | not_applicable"
   },
   "history": []
 }
@@ -49,6 +50,7 @@ Default path: `.sdlc/state.json` unless the repo defines another path.
 - do not store raw logs, raw browser output, long diffs, full test output, chain-of-thought, or broad summaries
 - store paths, counts, hashes, commit ids, command names, and terse status values instead of large content
 - current state is a convenience execution index for resume and routing; approved repo planning artifacts, checklists, review artifacts, and verification records remain authoritative for gates
+- state may summarize AC signoff status, but the final AC verification matrix in the planning/progress artifact remains authoritative
 - history is audit/debug only
 - never recompute current state from history when `current` exists
 - read history only for repeated failures, disputed findings, resume/debug work, or explicit user request
@@ -69,13 +71,13 @@ Implementation payload:
 Review payload:
 
 ```json
-{ "phase": "slice-review", "slice_id": "...", "review_status": "pending", "verification_status": "focused_passed|not_run", "diff_or_commit": "...", "unresolved_prior_finding": "..." }
+{ "phase": "slice-review", "slice_id": "...", "review_status": "pending", "verification_status": "focused_passed|not_run", "ac_signoff_status": "unchecked|partial|blocked|signed-off|deferred", "diff_or_commit": "...", "unresolved_prior_finding": "..." }
 ```
 
 Verification payload:
 
 ```json
-{ "phase": "verification", "slice_id": "...", "changed": "code|behavior", "review_status": "clean" }
+{ "phase": "verification", "slice_id": "...", "changed": "code|behavior", "review_status": "clean", "ac_signoff_status": "partial|signed-off|blocked|deferred" }
 ```
 
 ## Exit Criteria
@@ -85,3 +87,4 @@ Verification payload:
 - history has a concise entry for the latest material transition
 - large artifacts are referenced, not embedded
 - progress/planning docs remain current for human-readable decisions and resume context
+- any state AC signoff summary agrees with the authoritative final AC verification matrix

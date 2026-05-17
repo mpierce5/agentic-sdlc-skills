@@ -15,6 +15,7 @@ Use this skill after the functional and technical plans are reviewed.
 - attach tests-to-write-first to every slice
 - include slice-level Product AC, Technical AC, Negative AC, and targeted verification
 - include an AC trace table mapping Product AC, Technical AC, and Negative AC to planned tests, affected files, and responsible slices
+- include a final AC verification matrix separate from the trace table; the trace table maps planned coverage, while the final matrix records behavior-level proof and reviewer signoff
 - include the expected review/fix loop before broad verification so agents do not rerun expensive tests after every small review-finding fix
 - include the planned model for each slice review and the escalation trigger, if any
 - include the review-agent lifecycle plan for each slice: reuse the same-run combined reviewer, spawn a fresh reviewer, keep the reviewer open through same-slice finding fixes and re-review, or close the reviewer after resolution
@@ -22,6 +23,7 @@ Use this skill after the functional and technical plans are reviewed.
 - include the compact context package each reviewer should receive, defaulting code review to diff-only and avoiding full docs, unrelated files, or broad chat history unless specifically justified
 - include cached-context entries reviewers and implementers should reuse instead of re-reading unchanged files or logs
 - include the compact AC/TAC packet each slice reviewer should receive: assigned Product AC rows, Technical AC rows, Negative AC rows, trace-table rows, affected files, planned tests, and current verification status
+- include the expected proof depth for each AC row, especially when an AC crosses service/API, provider, persistence, FE/backend, model-selection, auth, billing, notification, scheduler, or sync boundaries
 - include a token budget note for noisy artifacts: how test output, browser observations, logs, and API payloads will be summarized before review agents see them
 - include a browser-verification budget when user-facing work is in scope, defaulting to one pass per target view unless failures require another pass
 - define whether the slice uses routine `SHALLOW` review only, allows `DEEP` escalation, or contributes to a later `ACCEPTANCE` gate
@@ -31,7 +33,7 @@ Use this skill after the functional and technical plans are reviewed.
 - write the execution plan into a durable repo document before implementation starts
 - include a test plan section in that document, not just test notes inside chat
 - include per-slice status tracking in that document so progress can be resumed safely later
-- commit execution-plan doc changes before implementation starts
+- commit execution-plan doc changes before implementation starts when the repo workflow permits commits; otherwise report the blocker and dirty doc paths
 - keep execution-plan output concise: prefer slice tables or bullets with decisions, gates, and statuses over long narrative explanation
 - on every material execution-plan iteration before implementation starts, run both a TPM review pass and an architect review pass
 - reuse the same refinement-wave TPM and architect reviewers by default instead of spawning fresh planning reviewers each iteration
@@ -70,9 +72,29 @@ Every slice must name the AC rows it owns or preserves. A slice may defer comple
 
 Routine review remains cost-controlled through reused reviewers and compact context, but it is not allowed to be vague: the reviewer must validate the assigned AC/TAC trace rows before the slice can be called review-clean.
 
+## Final AC Verification Matrix
+
+The execution plan must also include a final AC verification matrix before implementation starts. This matrix is separate from the trace table and is the only place an AC can be marked signed off.
+
+Each matrix row must include:
+
+- AC id and type: Product AC, Technical AC, or Negative AC
+- exact expected behavior in outcome terms
+- required proof depth: `behavior/API/service`, `contract`, `unit/helper`, `visual`, or `manual`
+- concrete proof/test to run or inspect
+- responsible slice or final acceptance gate
+- reviewer signoff status: `unchecked`, `signed-off`, `partial`, `blocked`, `deferred`, or `not applicable`
+- unchecked/deferred notes, including why narrower proof is sufficient if the AC is not proven at the service/API or user-visible boundary
+
+The matrix must distinguish intermediate proof from outcome proof. Route-tier classification, helper output, mocks, local state labels, CSS selectors, or object-shape checks are not enough to sign off an AC whose expected behavior is provider model choice, API behavior, persistence result, permission result, billing effect, notification delivery, sync outcome, or user-visible behavior.
+
+For cross-module AC, require service/API-level, integration, or end-to-end proof unless a reviewer explicitly signs off a narrower proof as sufficient and records why.
+
+Reviewers must mark rows `partial` or `blocked` when tests prove only an implementation detail but not the AC's stated behavior. A partial row is blocking for the wave unless the execution plan names a later gate to close it or the user explicitly accepts the deferral.
+
 ## Planning Artifact Commit
 
-If this phase creates or updates repo docs, commit those doc changes before exiting the phase.
+If this phase creates or updates repo docs, commit those doc changes before exiting the phase when the repo workflow permits commits.
 
 - check the worktree before editing and note unrelated existing changes
 - stage only the execution-plan docs touched by this phase
@@ -104,6 +126,7 @@ Each slice entry in the implementation-plan document must include:
 - assigned Technical AC rows
 - assigned Negative AC rows
 - AC coverage expectation: `complete`, `partial`, or `not applicable`, with the reason and follow-up gate for any partial row
+- final AC verification matrix rows owned by this slice, including exact expected behavior, required proof depth, current signoff status, and unchecked or deferred notes
 - combined review model and reasoning effort
 - escalation reason, or `none`
 - Phase 0 hotspot touched, or `none`
@@ -114,6 +137,7 @@ Each slice entry in the implementation-plan document must include:
 - whether reviewers should be closed after findings are resolved, accepted as no-fix, or explicitly deferred
 - compact review context to pass: current diff or commit, changed files, plan excerpt, verification status, unresolved prior findings if relevant, and rubric
 - compact AC/TAC packet to pass: assigned Product AC, Technical AC, Negative AC, trace-table rows, tests, affected files, and forbidden states
+- AC signoff packet to pass: final matrix rows owned or preserved by the slice, required proof depth, and whether available tests prove outcome behavior or only intermediate implementation behavior
 - review mode plan: `SHALLOW` by default, explicit `DEEP` triggers, and whether this slice is an `ACCEPTANCE` gate slice
 - if this is the final end-of-wave `ACCEPTANCE` gate, name the two required separate reviewers: architect reviewer and TPM or acceptance reviewer
 - code-review scope budget: `diff-only` by default, `changed-files` if needed, or named expanded context with justification
@@ -166,6 +190,7 @@ The final end-of-wave `ACCEPTANCE` gate must use two separate reviewers: one arc
 - every slice names safe review-independent prep, or explicitly says `none`
 - every slice has assigned Product AC, Technical AC, Negative AC, and targeted verification
 - every Product AC, Technical AC, and Negative AC row is mapped to tests or verification, affected files or contracts, and responsible slices
+- the final AC verification matrix exists and every Product AC, Technical AC, and Negative AC row has expected behavior, required proof depth, responsible gate, and initial signoff status
 - every slice defines its expected AC coverage verdict and the reviewer packet needed to validate it
 - every slice that touches a Phase 0 hotspot has an explicit no-net-worsening check
 - the repo implementation-plan document includes the execution slices, test plan, and current slice statuses
