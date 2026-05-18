@@ -12,7 +12,7 @@ Use this skill after the functional and technical plans are reviewed.
 - break the work into small, independently reviewable slices
 - convert Phase 0 hotspot findings into early prep slices, explicit no-growth guardrails, or a documented reason no refactor slice is needed
 - do not put feature behavior ahead of a required prep refactor when Phase 0 marked the touched seam as `hotspot` or `stop-and-refactor`
-- include a terminal clean-code retirement slice after feature slices and before final wave verification, unless the plan explicitly records that no cleanup slice is needed after checking the full inventory
+- include a terminal clean-code retirement slice after feature slices and before final wave verification, unless the plan explicitly records that no retirement slice is needed after checking the full inventory
 - attach tests-to-write-first to every slice
 - include slice-level Product AC, Technical AC, Negative AC, and targeted verification
 - include an AC trace table mapping Product AC, Technical AC, and Negative AC to planned tests, affected files, and responsible slices
@@ -30,7 +30,7 @@ Use this skill after the functional and technical plans are reviewed.
 - define whether the slice uses routine `SHALLOW` review only, allows `DEEP` escalation, or contributes to a later `ACCEPTANCE` gate
 - identify any review-independent prep that can run while the previous slice is under review
 - identify broader regression requirements for the final slice or an explicit wave-level verification gate, not for every intermediate slice commit
-- identify cleanup inventory requirements for the terminal clean-code retirement slice: unused/deprecated code, unreachable branches, duplicate paths, old compatibility shims, DB/schema/data objects, migrations or seed data, images/media/assets, generated files, failed attempts, temporary helpers, obsolete tests, scratch scripts, config flags, debug logs, stale docs, and unused dependencies introduced or exposed during the wave
+- identify clean-code inventory requirements for the terminal clean-code retirement slice: unused/deprecated code, unreachable branches, duplicate paths, old compatibility shims, DB/schema/data objects, migrations or seed data, images/media/assets, generated files, failed attempts, temporary helpers, obsolete tests, scratch scripts, config flags, debug logs, stale docs, and unused dependencies introduced or exposed during the wave
 - include a per-slice architecture-health check: whether the slice touches a hotspot, whether it must reduce/split/delete/contain it, and how review will verify no net worsening
 - write the execution plan into a durable repo document before implementation starts
 - include a test plan section in that document, not just test notes inside chat

@@ -114,7 +114,7 @@ Before implementation starts, the current planning artifact must capture:
 - AC trace table mapping AC rows to tests, affected files or contracts, and responsible slices
 - architecture or technical decisions
 - slice-by-slice execution plan
-- planned final clean-code retirement slice, or an explicit `not needed` rationale with the full cleanup inventory checked
+- planned final clean-code retirement slice, or an explicit `not needed` rationale with the full clean-code inventory checked
 - explicit test and verification plan
 - final AC verification matrix separate from the trace table, with exact expected behavior, proof/test, reviewer signoff status, and unchecked or deferred notes for every Product AC, Technical AC, and Negative AC row
 - out-of-scope items
@@ -191,7 +191,7 @@ Run the full workflow in this order unless the user explicitly narrows or resume
 7. For each approved slice, load `$slice-implement`; implement exactly one slice according to the reviewed execution plan.
 8. For each slice review, load `$slice-review`; require independent review, fix or explicitly triage findings, and only then run planned targeted verification.
 9. Repeat slice implementation and review until the execution plan is complete.
-10. Run the final clean-code retirement slice before final wave verification unless the execution plan explicitly says no cleanup slice is needed after checking the full inventory.
+10. Run the final clean-code retirement slice before final wave verification unless the execution plan explicitly says no retirement slice is needed after checking the full inventory.
 11. Run final verification, acceptance review, deployment checks, or status checks only as required by the execution plan, repo instructions, or user request.
 
 ## Output Economy

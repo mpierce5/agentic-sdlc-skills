@@ -38,7 +38,7 @@ Use the lightest review mode that still protects correctness.
 - `ACCEPTANCE`: full acceptance gate; full acceptance-criteria validation using the final AC verification matrix, architecture review, correctness sweep, and UX review when applicable
 - `CLEANUP`: terminal clean-code retirement review; validates removed code and non-code surfaces, absence of references, no supported behavior regression, and no broad unrelated cleanup beyond the plan
 
-`SHALLOW` is the routine slice-review mode. `DEEP` and `ACCEPTANCE` are explicit escalations, not the default for every slice.
+`SHALLOW` is the routine slice-review mode. `DEEP` and `ACCEPTANCE` are explicit escalations, not the default for every slice. `CLEANUP` is required for the terminal clean-code retirement slice.
 
 `ACCEPTANCE` review at the end of the full slice wave must use two separate reviewers:
 
