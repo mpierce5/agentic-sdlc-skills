@@ -18,6 +18,7 @@ Use this skill after the functional plan is reviewed.
 - do not allow the technical plan to add responsibility to a Phase 0 hotspot without a concrete architecture-improvement or containment decision
 - in prerelease work, prefer durable architecture over compatibility-preserving accretion
 - explicitly state what deprecated paths will be removed
+- identify where unused, deprecated, temporary, experimental, duplicate, fallback, compatibility, DB/schema/data, asset/image, generated, or dependency surfaces are likely to be created or made obsolete during implementation and require the execution plan to retire them before final verification
 - explicitly state what migration scripts and compatibility layers are intentionally not being created
 - write or update the technical plan in the repo planning artifact
 - commit technical-plan doc changes before leaving this phase when the repo workflow permits commits; otherwise report the blocker and dirty doc paths
@@ -41,6 +42,7 @@ Technical AC should cover applicable:
 - invariants that must remain true before and after the slice
 - forbidden states and forbidden data-flow crossings
 - obsolete prerelease paths to delete instead of extend
+- temporary, deprecated, unused, duplicate, failed-attempt, generated, DB/schema/data, asset/image, script, config, or dependency surfaces that must not remain in the branch
 - compatibility layers, migrations, or adapter code that must not be introduced unless explicitly approved
 
 Every Technical AC must be precise enough for an architect reviewer to check against a diff, targeted tests, and affected files without re-deriving the intended architecture.
@@ -64,6 +66,7 @@ If this phase creates or updates repo docs, commit those doc changes before exit
 - the technical plan is concrete enough that execution planning does not need to improvise architecture
 - Technical AC are explicit and pass/fail, not just design rationale
 - Phase 0 hotspot findings are either converted into prep refactors, explicit non-growth guardrails, deletion work, or a documented pause decision
+- clean-code retirement requirements that execution planning must convert into a terminal retirement slice are named, or explicitly marked not applicable
 - the plan states how the wave avoids making oversized files, duplicated flows, weak seams, or ownership ambiguity worse
 - review findings are incorporated or explicitly flagged
 - every material technical-plan iteration has had both TPM and architect review passes, or an explicit blocker is reported

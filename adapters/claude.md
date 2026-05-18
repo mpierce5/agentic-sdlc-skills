@@ -20,6 +20,8 @@ Do not paste full chat history into routine reviewers. Give the reviewer a compa
 - changed files
 - assigned Product AC, Technical AC, and Negative AC rows
 - AC trace rows
+- final AC verification matrix rows and required proof depth
+- clean-code retirement expectation and inventory/proof when applicable
 - planned tests and focused test results
 - relevant plan excerpt
 - open findings or deferrals

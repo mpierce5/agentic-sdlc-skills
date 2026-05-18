@@ -22,6 +22,8 @@ For routine review, spawn reviewers without full-context forking. Pass compact c
 - changed files
 - assigned Product AC, Technical AC, and Negative AC rows
 - trace-table rows
+- final AC verification matrix rows and required proof depth
+- clean-code retirement expectation and inventory/proof when applicable
 - planned tests and verification status
 - unresolved prior findings
 - review mode and model tier

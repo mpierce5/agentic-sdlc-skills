@@ -21,7 +21,7 @@ Default path: `.sdlc/state.json` unless the repo defines another path.
 {
   "current": {
     "task_id": "string",
-    "phase": "requirements | phase0 | functional-plan | technical-plan | execution-plan | slice-implement | slice-review | verification | finalize",
+    "phase": "requirements | phase0 | functional-plan | technical-plan | execution-plan | slice-implement | slice-review | clean-code-retirement | verification | finalize",
     "phase_gate": "not_applicable | draft | review_pending | reviewed | updated_from_review | committed",
     "slice_id": "string | null",
     "status": "not_started | in_progress | blocked | review_pending | review_clean | verification_pending | green | deferred",
@@ -37,7 +37,8 @@ Default path: `.sdlc/state.json` unless the repo defines another path.
     "last_commit": "sha | null",
     "review_status": "pending | blocking_findings | review_clean | deferred | no_fix",
     "verification_status": "not_run | focused_passed | broad_passed | failed",
-    "ac_signoff_status": "unchecked | partial | blocked | signed-off | deferred | not_applicable"
+    "ac_signoff_status": "unchecked | partial | blocked | signed-off | deferred | not_applicable",
+    "clean_code_retirement_status": "not_applicable | pending | clean | leftovers_found | deferred"
   },
   "history": []
 }
@@ -78,6 +79,12 @@ Verification payload:
 
 ```json
 { "phase": "verification", "slice_id": "...", "changed": "code|behavior", "review_status": "clean", "ac_signoff_status": "partial|signed-off|blocked|deferred" }
+```
+
+Clean-code retirement payload:
+
+```json
+{ "phase": "clean-code-retirement", "slice_id": "...", "clean_code_retirement_status": "pending|clean|leftovers_found|deferred", "inventory_source": "git diff/status/search/reference summary" }
 ```
 
 ## Exit Criteria

@@ -12,6 +12,7 @@ Use this skill after the functional and technical plans are reviewed.
 - break the work into small, independently reviewable slices
 - convert Phase 0 hotspot findings into early prep slices, explicit no-growth guardrails, or a documented reason no refactor slice is needed
 - do not put feature behavior ahead of a required prep refactor when Phase 0 marked the touched seam as `hotspot` or `stop-and-refactor`
+- include a terminal clean-code retirement slice after feature slices and before final wave verification, unless the plan explicitly records that no cleanup slice is needed after checking the full inventory
 - attach tests-to-write-first to every slice
 - include slice-level Product AC, Technical AC, Negative AC, and targeted verification
 - include an AC trace table mapping Product AC, Technical AC, and Negative AC to planned tests, affected files, and responsible slices
@@ -29,6 +30,7 @@ Use this skill after the functional and technical plans are reviewed.
 - define whether the slice uses routine `SHALLOW` review only, allows `DEEP` escalation, or contributes to a later `ACCEPTANCE` gate
 - identify any review-independent prep that can run while the previous slice is under review
 - identify broader regression requirements for the final slice or an explicit wave-level verification gate, not for every intermediate slice commit
+- identify cleanup inventory requirements for the terminal clean-code retirement slice: unused/deprecated code, unreachable branches, duplicate paths, old compatibility shims, DB/schema/data objects, migrations or seed data, images/media/assets, generated files, failed attempts, temporary helpers, obsolete tests, scratch scripts, config flags, debug logs, stale docs, and unused dependencies introduced or exposed during the wave
 - include a per-slice architecture-health check: whether the slice touches a hotspot, whether it must reduce/split/delete/contain it, and how review will verify no net worsening
 - write the execution plan into a durable repo document before implementation starts
 - include a test plan section in that document, not just test notes inside chat
@@ -48,6 +50,7 @@ Use this skill after the functional and technical plans are reviewed.
   - one combined slice review before slice-level targeted verification
   - fix findings and re-review with the same reviewers until review-clean
   - targeted verification for the slice
+  - run the terminal clean-code retirement slice after feature behavior is review-clean
   - broader regression checks only on the final slice or an explicit wave-level verification gate
   - if targeted verification fails, fix and re-enter review/fix before rerunning targeted verification; only widen when this is the final slice or verification gate
   - commit immediately after the slice is review-clean and green
@@ -92,6 +95,23 @@ For cross-module AC, require service/API-level, integration, or end-to-end proof
 
 Reviewers must mark rows `partial` or `blocked` when tests prove only an implementation detail but not the AC's stated behavior. A partial row is blocking for the wave unless the execution plan names a later gate to close it or the user explicitly accepts the deferral.
 
+## Clean-Code Retirement Slice
+
+Every execution plan must include a terminal clean-code retirement slice unless it explicitly records `not needed` with the full inventory checked.
+
+This slice is a clean-code gate, not a light artifact sweep. It is for all unused, deprecated, duplicate, temporary, superseded, unreachable, failed-attempt, or compatibility-preserving leftovers introduced or exposed by the current wave.
+
+The retirement slice must cover code and non-code surfaces:
+
+- run after feature slices are review-clean and before final wave verification
+- inventory branch-local additions, touched files, and coupled existing paths for unused/deprecated code, unreachable branches, duplicate implementations, temporary bridges, compatibility shims, fallback paths, debug helpers, stale docs, unused tests, scratch scripts, config flags, DB/schema/data objects, migrations/seed data, images/media/assets, generated files, and unused dependencies
+- delete branch-introduced leftovers and delete or update coupled existing deprecated paths when the wave made them obsolete
+- prove removed symbols, files, routes, DB objects, assets, scripts, flags, and dependencies have no remaining references with focused searches plus build/type/test coverage appropriate to the surface
+- update docs, state, dependency manifests, asset references, DB/schema docs, and the final AC verification matrix if retirement changes behavior, contracts, or verification evidence
+- receive a normal slice review; reviewers must treat leftover unused/deprecated code or non-code surfaces as blocking unless explicitly retained with a product or technical reason
+
+The retirement slice is not a license for broad opportunistic refactoring. If the inventory reveals unrelated pre-existing dead code, DB objects, assets, or docs, record it as follow-up unless it is directly coupled to the wave's AC, touched architecture, or architecture-health requirements.
+
 ## Planning Artifact Commit
 
 If this phase creates or updates repo docs, commit those doc changes before exiting the phase when the repo workflow permits commits.
@@ -127,6 +147,7 @@ Each slice entry in the implementation-plan document must include:
 - assigned Negative AC rows
 - AC coverage expectation: `complete`, `partial`, or `not applicable`, with the reason and follow-up gate for any partial row
 - final AC verification matrix rows owned by this slice, including exact expected behavior, required proof depth, current signoff status, and unchecked or deferred notes
+- clean-code retirement expectation: `not applicable`, `feature slice must leave no unused/deprecated surfaces`, or `terminal clean-code retirement slice`, with the inventory/proof required
 - combined review model and reasoning effort
 - escalation reason, or `none`
 - Phase 0 hotspot touched, or `none`
@@ -180,6 +201,7 @@ The final end-of-wave `ACCEPTANCE` gate must use two separate reviewers: one arc
 
 - slices are small enough to commit independently
 - required Phase 0 prep refactors are placed before feature slices that depend on the unhealthy seam
+- the plan includes a terminal clean-code retirement slice before final verification, or an explicit `not needed` rationale with full inventory scope
 - every slice has tests-first expectations
 - every material execution-plan iteration has had both TPM and architect review passes, or an explicit blocker is reported
 - every slice has explicit review/fix steps before broad verification

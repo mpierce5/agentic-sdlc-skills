@@ -22,6 +22,7 @@ When a parent agent delegates review to a sub-agent, the prompt should explicitl
 - validate the slice against the compact AC/TAC packet supplied by the parent agent: Product AC rows, Technical AC rows, Negative AC rows, trace-table mappings, planned tests, affected files, and forbidden states
 - validate the slice against the final AC verification matrix rows supplied by the parent agent; do not treat trace-table coverage as signoff
 - mark AC coverage `partial` or `blocked` when the supplied proof validates only intermediate implementation behavior and not the exact behavior promised by the AC
+- validate the slice against its clean-code retirement expectation; unused, deprecated, failed-attempt, duplicate, temporary, generated, debug, stale, unreachable, DB/schema/data, asset/image, script, config, dependency, or compatibility surfaces introduced or made obsolete by the wave are blocking unless the plan explicitly retains them with a reason
 - when using review sub-agents, pass explicit model-tier and reasoning-depth values when the agent platform supports them instead of inheriting the implementation agent's model by default
 - reuse the same-run combined reviewer when appropriate; do not spawn unlimited fresh review agents
 - log concrete findings
@@ -35,6 +36,7 @@ Use the lightest review mode that still protects correctness.
 - `SHALLOW`: default per-slice review; diff-first, focused correctness check, mandatory AC/TAC trace validation for assigned rows, and top findings only
 - `DEEP`: escalated review; expanded context, stronger architecture or contract validation, broader correctness sweep
 - `ACCEPTANCE`: full acceptance gate; full acceptance-criteria validation using the final AC verification matrix, architecture review, correctness sweep, and UX review when applicable
+- `CLEANUP`: terminal clean-code retirement review; validates removed code and non-code surfaces, absence of references, no supported behavior regression, and no broad unrelated cleanup beyond the plan
 
 `SHALLOW` is the routine slice-review mode. `DEEP` and `ACCEPTANCE` are explicit escalations, not the default for every slice.
 
@@ -112,6 +114,7 @@ Use terse findings-only output by default.
 - If AC coverage is `partial` or `blocked`, include a finding that names the uncovered Product AC, Technical AC, or Negative AC row.
 - If AC signoff is `partial` or `blocked`, include a finding that names the AC row and explains the gap between the available proof and the exact expected behavior.
 - Do not sign off an AC based only on route labels, helper return values, mocks, CSS selectors, local state labels, or object-shape checks when the AC promises provider model selection, API/service behavior, persistence, permissions, billing, notification delivery, sync behavior, or user-visible outcome.
+- For terminal clean-code retirement slices, include a finding for any leftover wave-introduced or wave-obsoleted unused/deprecated code, unreachable branch, failed-attempt work, unused export, DB/schema/data object, image/media/asset, abandoned test/doc/script/config, debug output, generated file, duplicate path, compatibility shim, or dependency that lacks an explicit retained reason.
 - output bullet issues only
 - include no prose summary unless there are zero findings
 - each finding should be one bullet with severity, file/path or symbol, and the concrete problem
@@ -148,6 +151,7 @@ Default lifecycle for one SDLC run:
 - pass a compact new prompt for each slice: current diff or commit, changed files, relevant plan excerpt, verification status (`pending` before the review/fix loop is clean, or results after verification), unresolved prior findings if relevant, and review rubric
 - every compact new prompt must include the assigned Product AC, Technical AC, Negative AC, trace-table rows, planned tests, affected files, forbidden states, and expected AC coverage verdict for the slice
 - every compact new prompt must include assigned final AC verification matrix rows, exact expected behavior, required proof depth, current proof/test evidence, and requested signoff status
+- every compact new prompt must include the clean-code retirement expectation, and terminal retirement prompts must include the branch-local and coupled-path inventory summary plus focused no-reference proof
 - tell a reused reviewer to treat the prompt as a fresh review of the named diff or commit
 - spawn a new reviewer without full-context forking only when no same-role reviewer exists, the existing reviewer is busy, the existing reviewer should be closed, or the slice requires fresh independence
 - before spawning, close idle review agents that are no longer needed
@@ -183,6 +187,7 @@ Record in the review result:
 - reviewer lifecycle: `reused` or `fresh`, whether same-slice follow-up was needed, and whether the reviewer was closed after resolution
 - compact-context source used for the review
 - verification status at review time: `pending`, `passed`, `failed`, or `not required yet`
+- clean-code retirement status: `not applicable`, `clean`, `leftovers found`, or `deferred with reason`
 - terse bullet findings and triage decision
 
 

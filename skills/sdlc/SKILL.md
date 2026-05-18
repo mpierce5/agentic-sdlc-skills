@@ -39,8 +39,9 @@ Default full-run checklist:
 20. Slice review fixes or explicit deferrals
 21. Targeted slice verification
 22. Slice commit
-23. Final wave verification, when required by the execution plan
-24. Final acceptance/deployment/status closeout
+23. Final clean-code retirement slice for unused, deprecated, duplicate, temporary, or superseded code, DB objects, assets, docs, tests, scripts, config, dependencies, generated files, and failed-attempt work
+24. Final wave verification, when required by the execution plan
+25. Final acceptance/deployment/status closeout
 
 If the user asks for only one phase, create the smaller checklist needed for that phase and use the corresponding phase skill directly.
 
@@ -78,6 +79,7 @@ Treat this workflow as gated, not advisory.
 - do not start execution planning until the technical plan has been independently reviewed and updated
 - do not start implementation until the execution plan has been independently reviewed, updated, committed, and accepted
 - do not start the next risky slice until the previous slice is review-clean, verified, and committed, or findings are explicitly accepted as no-fix or deferred
+- do not skip the final clean-code retirement slice unless the execution plan explicitly records that the wave introduced or exposed no unused, deprecated, failed-attempt, duplicate, temporary, superseded, or unreachable code, DB/schema/data object, asset/image, doc, test, script, config flag, dependency, generated file, or compatibility path
 - do not mark an AC checked, review-clean, or signed off when the proof covers only an intermediate implementation detail and not the expected product or technical behavior named by the AC
 - do not call the wave complete until the final AC verification matrix is filled in and all blocking or partial rows are fixed, explicitly accepted as no-fix, or explicitly deferred by the user or required reviewer
 - if the user explicitly asks to skip a gate, record the skipped gate and reason in the checklist and planning artifact
@@ -112,6 +114,7 @@ Before implementation starts, the current planning artifact must capture:
 - AC trace table mapping AC rows to tests, affected files or contracts, and responsible slices
 - architecture or technical decisions
 - slice-by-slice execution plan
+- planned final clean-code retirement slice, or an explicit `not needed` rationale with the full cleanup inventory checked
 - explicit test and verification plan
 - final AC verification matrix separate from the trace table, with exact expected behavior, proof/test, reviewer signoff status, and unchecked or deferred notes for every Product AC, Technical AC, and Negative AC row
 - out-of-scope items
@@ -188,7 +191,8 @@ Run the full workflow in this order unless the user explicitly narrows or resume
 7. For each approved slice, load `$slice-implement`; implement exactly one slice according to the reviewed execution plan.
 8. For each slice review, load `$slice-review`; require independent review, fix or explicitly triage findings, and only then run planned targeted verification.
 9. Repeat slice implementation and review until the execution plan is complete.
-10. Run final verification, acceptance review, deployment checks, or status checks only as required by the execution plan, repo instructions, or user request.
+10. Run the final clean-code retirement slice before final wave verification unless the execution plan explicitly says no cleanup slice is needed after checking the full inventory.
+11. Run final verification, acceptance review, deployment checks, or status checks only as required by the execution plan, repo instructions, or user request.
 
 ## Output Economy
 
@@ -209,6 +213,7 @@ Do not call an SDLC run complete until:
 - planning artifacts are current
 - required independent reviews happened or the blocker is recorded
 - slice commits exist for completed implementation slices
+- the final clean-code retirement slice is completed or explicitly marked not needed with an inventory-based rationale
 - planned verification passed or unresolved failures are recorded
 - final status names the verified URL or environment, backend/API origin when relevant, and commit when applicable
 

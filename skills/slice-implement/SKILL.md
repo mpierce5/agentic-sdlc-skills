@@ -14,6 +14,7 @@ Use this skill for exactly one slice at a time.
 - write or update the planned failing tests first
 - before coding, identify the slice's assigned Product AC, Technical AC, Negative AC, trace-table rows, and expected AC coverage verdict from the execution plan
 - before coding, identify the slice's final AC verification matrix rows, exact expected behavior, required proof depth, and current signoff status
+- before coding, identify the slice's clean-code retirement expectation, including whether this slice must leave no unused/deprecated surfaces or is the terminal retirement slice
 - implement the smallest coherent change for the slice
 - reuse valid cached file summaries, plan excerpts, and prior test results from the active planning/progress artifact instead of re-reading unchanged files or logs
 - refresh only stale cache entries whose source files, commands, or commits changed
@@ -39,6 +40,8 @@ Use this skill for exactly one slice at a time.
 - while review sub-agents run, continue with review-independent prep named in the execution plan when it is safe; do not start or commit the next risky slice until prior review findings are resolved, accepted as no-fix, or explicitly deferred
 - in prerelease work, do not add migration scripts or compatibility code unless the user explicitly asks for them or a still-supported contract truly requires them
 - prefer removing deprecated code over extending it
+- remove failed-attempt code, duplicate implementations, temporary helpers, unreachable branches, unused exports, stale DB/schema/data objects, unused images/media/assets, scratch scripts, debug output, generated files, stale docs, unused tests, and unused dependencies introduced by the current slice before calling the slice ready for review
+- if this is the terminal clean-code retirement slice, inventory the whole wave's branch-local additions, touched paths, and coupled existing paths; remove unused/deprecated code, DB/schema/data objects, assets/images, docs, tests, scripts, config flags, dependencies, generated files, compatibility shims, and failed-attempt work made obsolete by the wave; prove removed symbols/files/objects/assets have no remaining references
 - keep implementation output concise: report changed files, focused checks, blockers, and the next action; do not write an implementation diary
 
 ## Verification Batching
@@ -54,6 +57,7 @@ Focused checks during coding are expected. Broad verification is deliberately de
 - if targeted verification fails, fix the failure, then return to review/fix before rerunning targeted verification when the fix materially changes product code, contracts, tests, or architecture
 - if a verification fix is purely mechanical and cannot affect behavior, rerun only the failed verification first, then widen as needed
 - targeted verification must prove the AC's expected behavior, not just an intermediate label or helper result, whenever the AC crosses service/API, provider, persistence, model-selection, FE/backend, auth, billing, notification, scheduler, sync, or user-visible boundaries
+- clean-code retirement verification must include focused reference searches, build/type/test coverage appropriate to removed code and non-code surfaces, dependency/asset/schema checks when relevant, and any targeted behavior checks needed to prove retirement did not change supported behavior
 
 ## Review Concurrency
 
@@ -87,6 +91,7 @@ Do not use state to skip required combined slice review, targeted slice verifica
 - verification for that slice is recorded after the review/fix loop
 - AC coverage verdict is recorded with Product AC, Technical AC, and Negative AC rows that were checked or intentionally deferred
 - final AC verification matrix rows owned by the slice are updated with proof/test, proof depth, reviewer signoff status, and unchecked/deferred notes
+- clean-code retirement expectation is satisfied: no wave-introduced or wave-obsoleted failed-attempt, temporary, duplicate, unused, deprecated, generated, debug, stale, unreachable, DB/schema/data, asset/image, script, config, dependency, or compatibility surface remains without an explicit retained reason
 - updated test-result and file-summary cache entries are recorded when relevant
 - the combined review result is recorded with the explicit planned review model
 - any concurrent prep is recorded and does not stack a risky commit ahead of review resolution
