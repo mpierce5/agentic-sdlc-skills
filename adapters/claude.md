@@ -2,6 +2,13 @@
 
 Use this adapter when these skills run in Claude or Claude Code.
 
+Respect the current host's permissions for task creation, messaging, scheduling,
+and model selection. Map user-visible slice-owner tasks to supported fresh
+sessions; if the host cannot create one, return the compact handoff. Current
+ownership may continue within its assigned slice. Scheduled recovery requires
+user authorization; use the shared 15-minute abnormal-recovery policy only when
+such recurring work is requested.
+
 ## Skill References
 
 Reference repository-relative paths such as `skills/slice-review/SKILL.md` when asking a separate Claude session, subagent, or reviewer to follow a phase skill.
@@ -25,6 +32,10 @@ Do not paste full chat history into routine reviewers. Give the reviewer a compa
 - planned tests and focused test results
 - relevant plan excerpt
 - open findings or deferrals
+
+Disable parent-context inheritance when the host supports it. Follow any host
+progress-update requirement with concise updates; an update does not end the
+assigned slice or introduce an approval checkpoint.
 
 ## Model Tier Mapping
 

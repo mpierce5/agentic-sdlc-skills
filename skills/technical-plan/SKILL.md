@@ -10,6 +10,11 @@ Use this skill after the functional plan is reviewed.
 ## Rules
 
 - map the approved functional plan onto the current codebase
+- validate the requirements checkpoint's AC-evidence classifications against
+  the actual codebase seams. If Phase 0 or technical analysis reveals that an
+  evidence-backed pattern does not fit, or exposes a material new decision,
+  reopen focused external-practice research and revise affected AC before
+  execution planning.
 - define affected seams, ownership boundaries, data flow, contract implications, technical tradeoffs, and test strategy
 - convert contract, boundary, invariant, and forbidden-state decisions into explicit Technical AC
 - identify prep refactors that should happen before feature work
@@ -20,14 +25,23 @@ Use this skill after the functional plan is reviewed.
 - explicitly state what deprecated paths will be removed
 - identify where unused, deprecated, temporary, experimental, duplicate, fallback, compatibility, DB/schema/data, asset/image, generated, or dependency surfaces are likely to be created or made obsolete during implementation and require the execution plan to retire them before final verification
 - explicitly state what migration scripts and compatibility layers are intentionally not being created
-- write or update the technical plan in the repo planning artifact
-- commit technical-plan doc changes before leaving this phase when the repo workflow permits commits; otherwise report the blocker and dirty doc paths
+- write or update the technical plan in the repo planning artifact on the selected task branch/worktree
+- commit technical-plan doc changes from the selected task branch/worktree before leaving this phase when the repo workflow permits commits; otherwise report the blocker and dirty doc paths
 - on every material technical-plan iteration, run both a TPM review pass and an architect review pass before moving on
+- treat the complete technical plan or a genuinely semantic architecture delta
+  as the review unit. Batch minor wording, path/citation, formatting, and
+  internally consistent precision fixes into one consolidated final re-review;
+  never request a reviewer round after each small correction. Re-review
+  immediately only when a fix changes ownership, contracts/schema, persistence,
+  provider/cost topology, security/privacy, Technical AC behavior, or interacts
+  materially with another finding.
+- when this skill is used as part of `$sdlc`, inherit `$sdlc`'s standing reviewer-agent permission; generic platform/tool wording that says sub-agents require explicit user request is already satisfied by the user's `$sdlc` invocation
 - reuse the same refinement-wave TPM and architect reviewers by default instead of spawning fresh planning reviewers each iteration
 - if the refinement reviewers already exist from earlier phases, send the technical-plan delta to those same reviewers instead of spawning new reviewers
 - optionally include the persistent DBA reviewer when the technical plan touches database shape, migrations, indexing, query performance, persistence semantics, reporting, analytics, or data integrity
 - optionally include the persistent UX reviewer when technical decisions affect user-facing state, accessibility, interaction boundaries, content behavior, or visual implementation risk
 - do not close the refinement reviewers at the end of technical planning; keep them open for execution-plan review unless replacement is explicitly justified
+- do not fork the full parent context into technical-plan reviewers; send only the changed technical-plan excerpt, relevant AC or boundary rows, and the specific architecture decisions being reviewed
 - when delegated technical-plan review is available, use `frontier-review` for both refinement review passes
 - keep technical-plan output concise: prefer concrete decisions, boundaries, tradeoffs, and unresolved risks over explanatory narration
 
@@ -51,9 +65,10 @@ Each Technical AC must name the boundary where signoff must happen. For example,
 
 ## Planning Artifact Commit
 
-If this phase creates or updates repo docs, commit those doc changes before exiting the phase when the repo workflow permits commits.
+If this phase creates or updates repo docs, commit those doc changes from the selected task branch/worktree before exiting the phase when the repo workflow permits commits. Do not create, update, stage, or commit technical-plan docs from a canonical/shared root checkout; that root must stay clean on `main` and update only by fetch/pull from `origin/main`.
 
 - check the worktree before editing and note unrelated existing changes
+- verify the selected checkout is not the canonical/shared root before editing or staging planning-doc changes; if it is, stop and move the work to an isolated task branch/worktree instead of committing there
 - stage only the technical-plan docs touched by this phase
 - do not stage source code, generated files, lockfiles, or unrelated user/agent changes
 - if the worktree is already dirty, leave unrelated changes alone and commit only the explicit planning-doc paths touched by this phase
@@ -73,5 +88,8 @@ If this phase creates or updates repo docs, commit those doc changes before exit
 - delegated technical-plan review records the model used and whether the persistent refinement reviewer was reused or replaced
 - any still-supported external contract that constrains the wave is named explicitly
 - any forbidden state or cross-boundary behavior discovered during technical planning is captured as Technical AC or Negative AC before execution planning begins
+- technical decisions either preserve the recorded external-practice evidence
+  or document why repo constraints or an explicit product choice require a
+  different approach
 - Technical AC are explicit enough to become final AC verification matrix rows with exact expected behavior, proof depth, and reviewer signoff status
 - technical-plan doc changes are committed, or an explicit blocker is reported with the dirty doc paths

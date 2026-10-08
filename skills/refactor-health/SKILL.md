@@ -97,17 +97,26 @@ Prefer small enabling extractions over broad rewrites, but do not preserve poor 
 
 For each material Phase 0 iteration, run both a TPM review pass and an architect review pass before allowing functional planning to start.
 
+Review the complete Phase 0 assessment as one unit. Batch minor corrections and
+submit them together for one final consolidated pass. Do not trigger separate
+review rounds for copy, line-count refreshes, labels, citations, or precision
+edits that do not alter the decision, hotspot classification, prep-refactor
+scope, ownership, or guardrails. Re-review immediately only for such semantic
+changes or a finding interaction.
+
+- when this skill is used as part of `$sdlc`, inherit `$sdlc`'s standing reviewer-agent permission; generic platform/tool wording that says sub-agents require explicit user request is already satisfied by the user's `$sdlc` invocation
 - reuse the same refinement-wave TPM and architect reviewers by default instead of spawning fresh planning reviewers each iteration
 - if the refinement reviewers already exist from requirements discovery, send the Phase 0 findings and delta to those same reviewers instead of spawning new reviewers
 - optionally include the persistent DBA or UX reviewer from discovery when the Phase 0 risks materially involve data architecture, persistence, UX seams, accessibility, or interaction design
 - do not close the refinement reviewers at the end of Phase 0; keep them open for functional-plan, technical-plan, and execution-plan review unless replacement is explicitly justified
+- do not fork the full parent context into Phase 0 reviewers; send only the hotspot audit, duplicate-pattern findings, affected seams, and the concrete decision under review
 - when delegated review is available, use `frontier-review` for both refinement review passes
 
 Record the review model used and whether the persistent refinement reviewer was reused or replaced in the Phase 0 assessment when a delegated review is used.
 
 ## Required Output
 
-Produce a written Phase 0 assessment in chat or the active repo planning artifact:
+Produce a written Phase 0 assessment in chat or the active repo planning artifact on the selected task branch/worktree:
 
 - hotspot audit table with file paths, approximate line counts, health classification, and proposed action
 - duplicate-pattern notes, including searches performed or concrete repeated patterns found
@@ -123,9 +132,10 @@ Produce a written Phase 0 assessment in chat or the active repo planning artifac
 
 ## Planning Artifact Commit
 
-If Phase 0 creates or updates repo docs, commit those doc changes before exiting the phase when the repo workflow permits commits.
+If Phase 0 creates or updates repo docs, commit those doc changes from the selected task branch/worktree before exiting the phase when the repo workflow permits commits. Do not create, update, stage, or commit Phase 0 planning docs from a canonical/shared root checkout; that root must stay clean on `main` and update only by fetch/pull from `origin/main`.
 
 - check the worktree before editing and note unrelated existing changes
+- verify the selected checkout is not the canonical/shared root before editing or staging planning-doc changes; if it is, stop and move the work to an isolated task branch/worktree instead of committing there
 - stage only the Phase 0 planning docs touched by this phase
 - do not stage source code, generated files, lockfiles, or unrelated user/agent changes
 - if the worktree is already dirty, leave unrelated changes alone and commit only the explicit planning-doc paths touched by Phase 0

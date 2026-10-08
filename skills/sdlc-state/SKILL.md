@@ -13,7 +13,7 @@ Preserve the existing SDLC behavior. State may help resume, skip already-green u
 
 ## File
 
-Default path: `.sdlc/state.json` unless the repo defines another path.
+Default path: `.sdlc/state.json` unless the repo defines another path. Create or update this file only in the selected task branch/worktree. Do not create, update, stage, or commit SDLC state from a canonical/shared root checkout; that root must stay clean on `main` and update only by fetch/pull from `origin/main`.
 
 ## Shape
 
@@ -57,6 +57,7 @@ Default path: `.sdlc/state.json` unless the repo defines another path.
 - read history only for repeated failures, disputed findings, resume/debug work, or explicit user request
 - keep `phase_gate` current during planning phases so draft, review-pending, reviewed, updated-from-review, and committed are distinguishable
 - update the human-readable planning/progress artifact when state changes imply material progress, risk, review, verification, or deferral
+- before editing state or progress artifacts, verify the selected checkout is not the canonical/shared root; if it is, stop and move the work to an isolated task branch/worktree instead of writing there
 - keep state output terse and structured; do not store prose summaries when paths, hashes, counts, statuses, and short deltas are enough
 
 ## Step-Scoped Payloads

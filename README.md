@@ -22,7 +22,59 @@ The detailed phase behavior lives in the subskills. The orchestrator should not 
 - `skills/functional-plan`, `skills/technical-plan`, and `skills/execution-plan` create reviewed planning artifacts.
 - `skills/slice-implement` and `skills/slice-review` run one reviewed implementation slice at a time.
 - `skills/sdlc-state` maintains compact resumable execution state.
+- `skills/implement` resumes an already approved wave at implementation.
+- `skills/worktree-setup` discovers project setup and protects shared checkouts.
+- `skills/lane-bootstrap` prepares isolated lanes and compact owner handoffs.
+- `skills/golden-merge` closes reviewed work through the project's merge policy;
+  specialized golden rules apply only when the consuming project defines them.
 - `adapters/` maps generic workflow terms to a specific agent platform.
+
+## Active Rules Refresh
+
+The shared bundle was compared with the active installed skills and refreshed
+on 2026-10-08. All nine existing skills and their UI metadata were updated; the
+four workflow dependencies listed above were added. The source-selection
+reference remains bundled with the orchestrator.
+
+The refreshed workflow includes external-practice research and AC-evidence
+classification, a bounded defect fast path, compact independent review packets,
+batched review fixes, explicit slice ownership and handoff rules, affected-boundary
+verification with honest evidence reuse, and optional nonblocking telemetry.
+Final behavior-level AC signoff and clean-code retirement gates remain required.
+
+The shared versions intentionally adapt local rules for reuse:
+
+| Active local detail | Shared location or behavior |
+| --- | --- |
+| Concrete agent models and reasoning | Platform adapter or consuming-repo routing policy |
+| Lane provisioning, binding, phase, and cleanup script names | Discover documented consuming-repo entrypoints |
+| Required provider and paid qualification policy | Accepted plan and consuming-repo provider authority |
+| Provider-specific deployment exceptions | Apply only explicit consuming-repo exceptions |
+| Architecture runbook names and domain examples | Read the exact authority docs for the affected project |
+| Older bootstrap telemetry gates | Follow the newer optional, nonblocking telemetry rule |
+| Scheduled recovery and visible task creation | Respect user authorization and host capabilities |
+
+Installed skills are the comparison source, not a publication-ready mirror.
+Do not overwrite the installed copies as part of maintaining this repository.
+
+## Use On Another Project
+
+1. Install the complete `skills/` bundle in the target agent's skill root so the
+   orchestrator and all required phase skills are available together.
+2. Select the applicable adapter in `adapters/` and expose its instructions to
+   the agent. Resolve concrete models against that host's available models.
+3. In the consuming project's `AGENTS.md` or equivalent, document its default
+   branch/remote, protected checkout rules, supported setup and cleanup commands,
+   verification commands and environments, merge/release policy, and any
+   provider-test or deployment exceptions.
+4. Mark absent lane, database, retrieval, telemetry, or phase utilities as
+   unavailable or not applicable. Optional diagnostics are not prerequisites.
+5. Invoke `$sdlc` for refinement and planning, or `$implement` only after the
+   reviewed execution plan is accepted.
+
+The current workflow uses `main` and `origin/main` as its baseline convention.
+Projects with another default branch or remote must document the equivalent
+mapping before use.
 
 ## Quality Gates
 

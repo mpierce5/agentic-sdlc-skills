@@ -1,0 +1,4 @@
+interface:
+  display_name: "Implement"
+  short_description: "Run approved SDLC slices to completion"
+  default_prompt: "Use $implement to implement all refined SDLC slices and complete the merge closeout."

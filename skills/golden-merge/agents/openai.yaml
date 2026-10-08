@@ -1,0 +1,4 @@
+interface:
+  display_name: "Golden Merge"
+  short_description: "Merge reviewed work to main safely."
+  default_prompt: "Use $golden-merge to merge this reviewed branch to main with the correct golden or non-golden closeout path."
