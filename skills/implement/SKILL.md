@@ -1,9 +1,32 @@
 ---
 name: implement
-description: "Execute an already refined and approved SDLC wave only. Use when the user says $implement after SDLC refinement/planning is complete and wants Codex to run the approved implementation slices, reviews, verification, merge to main, and local main sync. Do not use for requirements discovery, Phase 0, functional planning, technical planning, or execution-plan drafting."
+description: "Execute an approved Full SDLC plan or an explicitly selected Light/Defect compact change through implementation, independent LLM review, affected verification, and authorized closeout. Do not restart Full refinement or require human code review."
 ---
 
 # Implement
+
+## Workflow mode and authorization
+
+Full is the default when neither the user nor accepted continuation packet names
+a mode. Full requires its approved execution plan. Explicit Light/Defect execution
+accepts the compact packet specified by `$sdlc` instead: accepted AC, bounded
+scope, existing seam/pattern, targeted proof, and defect evidence when applicable.
+Do not demand completed Full phases, matrices, a planning bench, or a separate
+retirement slice for that packet. If compact inputs are missing, capture them
+from the authorized request and known repo behavior; ask only about materially
+ambiguous AC or design/architecture decisions. This is bounded preparation,
+not a restart of Full refinement.
+
+Humans confirm AC and resolve decisions the LLM needs support on. Independent
+code and architecture reviews are LLM reviews. No human code-review, routine
+implementation approval, or routine merge approval is a required gate.
+Reuse accepted AC rather than asking for redundant confirmation. Light/Defect
+retain one direct owner and combined code/architecture/cleanup review, followed
+by targeted proof and reviewer evidence inspection before green completion.
+The instructions below about Full planning/slices/matrices and whole-wave
+retirement apply to Full only. Shared repo safety/provider/verification rules
+apply to every mode. Merge/deploy only when authorized by the user's request or
+accepted scope; the execution wrapper does not expand external action authority.
 
 Use this skill as an execution-only wrapper around `$sdlc`. It does not replace `$sdlc`; it tells the execution agent that refinement and planning are already complete and the user has authorized implementation and closeout.
 
@@ -21,7 +44,7 @@ This skill starts at the ready-for-implementation checkpoint. It must not perfor
   each slice worker owns only its assigned slice plus its reviewer/fix loop.
   Reusing one task across multiple substantive slices requires an explicit
   accepted-plan `single-task-wave-owner` exception with rationale.
-- Confirm there is an approved execution plan with refined slices before editing code. If that artifact or approval is missing, stale, ambiguous, or not discoverable, stop and ask for human input instead of running refinement.
+- For Full, confirm there is an approved execution plan with refined slices before editing code. If that artifact or approval is missing, stale, ambiguous, or not discoverable, stop and ask for human input instead of running refinement.
 - Ensure all refined and approved execution-plan slices are implemented one
   slice at a time using `$sdlc`, `$slice-implement`, and `$slice-review` gates.
   The orchestrator continues forcefully through the wave by launching and
@@ -43,20 +66,25 @@ This skill starts at the ready-for-implementation checkpoint. It must not perfor
   slice unless `single-task-wave-owner` was explicitly approved.
 - If a review finds issues, stay inside the same `$implement` run: fix the findings, rerun verification, and re-review as needed, then continue the wave.
 - For authorized LLM/provider hardening, follow the provider-specific order in
-  `$slice-implement` and repository policy: repair, run affected deterministic
-  safety proof, retry the same provider row until green, and run the fresh
+  `$slice-implement` and repository policy: repair, immediately retry the exact
+  failed provider row through the maintained runner's built-in guards until
+  green, and run the complete fresh
   configured unseen group on the candidate branch before requesting the final
   review of the completed diff. Do not reinterpret the ordinary
   review-before-targeted-verification default as review-before-paid diagnostic
   replay or unseen qualification.
 - Do not run requirements discovery, Phase 0 refactor-health, functional planning, technical planning, execution-plan drafting, or refinement review under this skill.
 - Do not invent new scope or revise the plan beyond the normal implementation-slice review/fix loop. If plan changes are needed, stop and report the needed refinement.
-- Do not skip independent reviews, targeted verification, final clean-code retirement, AC verification matrix updates, or repository-specific handoff checks required by `$sdlc`.
+- Keep the selected mode's independent LLM review, targeted proof, and AC updates.
+  Full uses its planned retirement and final matrix; Light/Defect use inline
+  cleanup and the compact table. Handoff checks apply only to actual transfers.
 - Do not end the run merely because a useful status report can be given. Reporting is secondary to continuing execution.
 
 ## Merge And Main Sync
 
-After all slices are completed, follow `$sdlc` closeout rules to merge the changes into `main`.
+After the authorized work is complete, follow `$sdlc` closeout rules. When merge
+is included in the accepted scope, merge through the repo path and sync main;
+otherwise preserve the reviewed lane and report the implemented commit.
 
 Required closeout expectations:
 
@@ -76,7 +104,7 @@ when the current task is the direct execution owner. A final completion report
 names the result, verification, relevant artifact/commit/PR, and any next
 required human action. Do not send routine progress notes.
 
-## Automatic semantic phase movement
+## Automatic semantic phase movement (Full mode)
 
 When the consuming repo exposes a documented semantic phase-transition
 entrypoint, invoke it once after clean independent slice review using only its

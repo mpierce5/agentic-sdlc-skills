@@ -5,6 +5,17 @@ description: "Discover, select, verify, and close the correct branch/worktree/la
 
 # Worktree Setup
 
+## Workflow mode
+
+Full is the default. Light/Defect use `$sdlc`'s accepted compact packet as the
+plan/result; use that packet instead of separate phase docs or execution matrices.
+The current task may provision and own its one coherent change directly. Do not
+require a separate setup worker, execution task, coordinator heartbeat, or handoff
+when ownership stays in this task. Record `current-task-direct`, parent task
+`none`, and parent-context forked `no`. A compact handoff is needed only for an
+actual ownership transfer. Mode does not waive factual lane/status, protected-root,
+author, environment, or safe cleanup checks. Human code review is not a gate.
+
 Use this skill at SDLC start and closeout when branch/worktree/lane setup may
 affect correctness.
 
@@ -154,17 +165,25 @@ when the user explicitly approves it for that task.
 
 ## Closeout
 
-Before final SDLC closeout, return to this skill and either:
-
-- record that the active worktree/lane should remain for review, or
-- stop/clean only the resources owned by this task using repo-approved cleanup
-  commands
+Before final SDLC closeout, stop only task-owned servers/watchers and other
+resources holding its worktree open, then clean through the repo command.
+All modes record a factual worktree disposition in the existing result:
+`removed`, `not_applicable`, `retained`, or `blocked`. `removed` requires both
+directory absence and Git registration absence; exit zero alone is insufficient.
+Retain a lane only for a concrete ongoing review, unmerged work, or planned
+ownership transfer; name the reason, next action, and responsible owner.
+An actual deletion failure is `blocked`, not optional telemetry or completed
+cleanup. Record the exact error and recovery owner; do not silently abandon it.
 
 If the repo has a script-owned lane closeout path, use its documented
-agent-facing entrypoint from outside the target lane before reporting closeout
-complete. Verify the exact target and require merged, clean, inactive ownership
-before removal. Use non-forced branch deletion; preserve dirty or unmerged work
-and report the blocker.
+agent-facing entrypoint from outside the target lane. Verify the exact target,
+merged/clean state, and inactive ownership before routine disposal; preserve
+needed dirty or unmerged work unless its disposal is explicitly authorized.
+Inspect both directory and Git-registration absence, not only command exit.
+Partial removal remains blocked. Release only owned locks and use documented
+safe retry/recovery when supported. Never reconstruct recovery records or
+delete an orphan solely from inventory. Use non-forced branch deletion;
+an intentionally preserved branch is separate from disk-consuming leftovers.
 
 Also verify that any canonical/shared repo root checkout is clean, on `main`,
 tracking `origin/main`, and updated only by fetch/pull from `origin/main`. If

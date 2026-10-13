@@ -5,6 +5,21 @@ description: Run the mandatory Phase 0 refactor-health and architectural-fit rev
 
 # Refactor Health
 
+## Mode scope and human review
+
+Full is the default. The separate phase workflow, phase reviews, document/matrix
+requirements, and phase commits below apply to Full. When `$sdlc` selects Light
+or Defect, capture only this phase's relevant outcome, affected-seam guardrails,
+and proof decisions in the single compact packet. Do not restart this standalone
+phase or create its separate artifacts/reviewer bench unless escalation to Full
+requires it. Follow `$sdlc`'s mode eligibility and shared safety rules.
+
+Humans confirm AC and resolve product/design/architecture questions the LLM
+cannot safely settle. Reuse already accepted AC from the user's instruction or
+approved artifact; ask again only for new, ambiguous, or materially changed AC.
+TPM/architect and code reviews are independent LLM reviews. Neither implementation
+nor routine closeout requires a human code-review or automatic approval gate.
+
 Use this skill for mandatory Phase 0 in the SDLC loop.
 
 This is not implementation and not feature planning. It is an architecture-fit gate that answers whether the repo is healthy enough to proceed directly, needs bounded prep refactors, or should pause for a standalone refactor before product work deepens.

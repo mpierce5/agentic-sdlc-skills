@@ -1,4 +1,4 @@
 interface:
   display_name: "Implement"
   short_description: "Run approved SDLC slices to completion"
-  default_prompt: "Use $implement to implement all refined SDLC slices and complete the merge closeout."
+  default_prompt: "Use $implement to execute the approved Full plan or explicitly selected Light/Defect packet through independent LLM review and proof, with human input only for AC or unresolved design/architecture questions and closeout only as authorized."

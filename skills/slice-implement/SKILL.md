@@ -1,9 +1,37 @@
 ---
 name: slice-implement
-description: Implement exactly one reviewed execution-plan slice for prerelease product work. Use when the user wants one slice executed with tests-first expectations, a review/fix loop before broad verification, targeted verification after review is clean, immediate commit after the slice is green, and no batching of multiple slices into one commit.
+description: "Implement one approved Full execution-plan slice or accepted Light/Defect compact change through independent LLM review, targeted outcome proof, cleanup, and a coherent commit."
 ---
 
 # Slice Implement
+
+## Mode-specific input and review status
+
+Full is the default and uses the reviewed execution plan. Light/Defect use the
+accepted compact packet defined by `$sdlc`: scope, outcome/negative/technical AC
+with proof boundaries, existing seam/owner, targeted checks, and cleanup
+expectation. For Defect also require observed failure, established expected
+behavior, diagnosis, and regression proof. That packet replaces separate plan,
+trace, and final matrix inputs throughout this skill; missing Full-only artifacts
+are not blockers. One task owns this coherent change through requested closeout.
+No separate planning bench, retirement slice, state file, or execution task is
+required solely for a bounded mode.
+
+Full keeps planned tests-first work. Bounded logic changes use meaningful new or
+existing affected tests; a defect should have proof detecting the original
+failure. Copy/spacing changes may use focused visual/manual verification without
+invented unit tests. Keep cleanup local to the change and include it in the
+combined final LLM review.
+
+Use independent LLM code/architecture/cleanup review before targeted verification,
+except for the repo's authorized exact-row-first provider repair loop. Record
+code-review CLEAN separately from acceptance pending/verified. After proof passes,
+the same reviewer inspects its summary to verify AC; do not repeat the whole diff
+review unless a material fix changed it. Commit only after required review and
+proof are complete. Humans review AC or support unresolved design/architecture
+decisions, never as a mandatory code-review or routine implementation gate.
+Mode selection does not authorize merge/deployment/provider calls; perform only
+the requested closeout with the applicable repo safeguards.
 
 Use this skill for exactly one slice at a time.
 
@@ -17,10 +45,14 @@ task is allowed only when the accepted plan explicitly records
 
 - do not re-plan the whole project
 - keep coding in the primary implementation agent by default; do not spawn a separate coding agent unless the task is isolated, non-critical-path, and has a clear disjoint write scope
-- write or update the planned failing tests first
-- before coding, identify the slice's assigned Product AC, Technical AC, Negative AC, trace-table rows, and expected AC coverage verdict from the execution plan
-- before coding, identify the slice's final AC verification matrix rows, exact expected behavior, required proof depth, and current signoff status
-- before coding, identify the slice's clean-code retirement expectation, including whether this slice must leave no unused/deprecated surfaces or is the terminal retirement slice
+- in Full, write or update the planned failing tests first; in Light/Defect, use
+  the meaningful regression or outcome proof specified by the compact packet
+- before coding, identify assigned Product/Technical/Negative AC and expected
+  coverage from the accepted plan or compact packet; trace-table rows apply only to Full
+- identify the mode-specific AC/proof record: Full's final verification matrix
+  or Light/Defect's compact table, including expected outcome, proof depth, and signoff
+- identify cleanup expectations: inline cleanup for Light/Defect, or the Full
+  plan's slice/terminal retirement expectations
 - for a legacy-to-golden conversion, add mandatory AC to inventory legacy
   runtime/test/fixture/helper/compatibility/assertion surfaces, replace their
   coverage with approved replacement-path proof, delete superseded paths, and give
@@ -39,7 +71,8 @@ task is allowed only when the accepted plan explicitly records
 - run focused checks before routine slice review when they help tighten the next review/fix loop
 - run one combined slice review before slice-level targeted verification
 - pass the combined reviewer the compact AC/TAC packet for this slice rather than only a general plan excerpt
-- pass the combined reviewer the final AC verification matrix rows for this slice, including expected behavior, required proof depth, proof evidence, and any unchecked/deferred notes
+- pass the reviewer the mode-specific AC/proof rows, expected behavior, proof
+  depth, available evidence, and unchecked/deferred notes
 - fix review findings and re-review with the same reviewers until there are no blocking findings, findings are accepted as no-fix, or findings are explicitly deferred
 - treat safe, self-contained defects revealed by the slice or review as owned
   repair work even when they expand beyond the initial file list; record the
@@ -57,19 +90,19 @@ task is allowed only when the accepted plan explicitly records
   plan is supported and harden the generic path: audit lookup/authority facts,
   template and adapter eligibility, contract/slot shape, provider-agnostic
   prompts, and required execution/persistence/hydration proof; repair the
-  code, run only the minimum provider-free syntax/registration/admission proof,
-  immediately rerun the same row until green, and then run the fresh configured
+  code and immediately rerun the exact failed row through the maintained
+  runner's built-in guards until green, then run the complete fresh configured
   unseen group on the candidate branch rather than broadening the test to
   accept the failed choice; obtain one final review of the completed live-green
   diff instead of reviewing between retries or before unseen qualification
-- for authorized provider proof, use the required provider and optional
-  comparisons named by the consuming repo and accepted slice. Do not turn an
-  optional comparison into a hidden prerequisite or infer paid-test authority
-  from the execution agent's model assignment.
+- for authorized provider qualification, use the accepted track's repo-approved
+  provider/profile and maintained runner guards. Do not run a separate
+  deterministic command before transport; other providers require an explicit
+  comparison scope and never become a hidden prerequisite.
 - treat an authorized LLM/provider row as focused implementation feedback, not
-  as the post-review targeted verification pass: fix code, run only the minimum
-  provider-free safety/admission proof, retry only the same row immediately,
-  iterate until green, and run the fresh configured unseen group before
+  as the post-review targeted verification pass: fix code and immediately retry
+  only the exact failed row through the maintained runner's built-in guards;
+  iterate until green, and run the complete fresh configured unseen group before
   requesting the combined slice/architecture/acceptance review. If review
   changes provider-visible behavior, rerun the affected diagnostic and unseen
   live proof; if it changes scenario generation, hydration, oracle, or test
@@ -99,7 +132,9 @@ task is allowed only when the accepted plan explicitly records
 - do not batch multiple slices into one commit
 - after committing, record the `$slice-review` results and use the review model tiers recorded in the execution plan instead of allowing review sub-agents to inherit the implementation model
 - record the reviewer's AC coverage verdict: `complete`, `partial`, `not applicable`, or `blocked`, plus any uncovered AC ids and follow-up gate
-- update the final AC verification matrix for rows owned by the slice; mark rows `signed-off` only when proof reaches the expected behavior and required proof depth, otherwise mark `partial`, `blocked`, or `deferred` with notes
+- update the mode-specific AC/proof record for owned rows; sign off only when
+  proof reaches the expected outcome/depth, otherwise record pending, partial,
+  blocked, or an explicitly accepted deferral with its later gate
 - while review sub-agents run, continue with review-independent prep named in the execution plan when it is safe; do not start or commit the next risky slice until prior review findings are resolved, accepted as no-fix, or explicitly deferred
 - in prerelease work, do not add migration scripts or compatibility code unless the user explicitly asks for them or a still-supported contract truly requires them
 - prefer removing deprecated code over extending it
@@ -173,7 +208,8 @@ Do not use state to skip required combined slice review, targeted slice verifica
 - that slice has its own commit
 - verification for that slice is recorded after the review/fix loop
 - AC coverage verdict is recorded with Product AC, Technical AC, and Negative AC rows that were checked or intentionally deferred
-- final AC verification matrix rows owned by the slice are updated with proof/test, proof depth, reviewer signoff status, and unchecked/deferred notes
+- owned mode-specific AC/proof rows record checks, proof depth, reviewer signoff,
+  and unchecked/deferred notes; only Full requires a separate final matrix
 - clean-code retirement expectation is satisfied: no wave-introduced or wave-obsoleted failed-attempt, temporary, duplicate, unused, deprecated, generated, debug, stale, unreachable, DB/schema/data, asset/image, script, config, dependency, or compatibility surface remains without an explicit retained reason
 - updated test-result and file-summary cache entries are recorded when relevant
 - the combined review result is recorded with the explicit planned review model
@@ -182,10 +218,10 @@ Do not use state to skip required combined slice review, targeted slice verifica
   intended model/reasoning, handoff path, and whether the next owner will reuse
   the lane serially or use a separate parallel worktree.
   Serial reuse is allowed only after this task is fully stopped as a writer and
-  its clean exact pushed head and released lease are durable; the coordinator
-  must rebind the exclusive lease, task id, activation epoch, and ownership
-  registry before the fresh next task writes. Retrieval and telemetry
-  diagnostics are optional and local
+  its clean exact pushed head, prior writer shutdown, and named next owner/scope
+  are durable. Follow an additional ownership protocol only when current repo
+  authority actually defines and supports it. Do not invent retired registry,
+  lease, or activation calls. Retrieval and telemetry are optional diagnostics
 - the current task releases writable slice ownership after this exit unless an
   explicit `single-task-wave-owner` exception applies
 

@@ -5,6 +5,17 @@ description: Create or refresh a task branch/worktree/lane and write the lane-lo
 
 # Lane Bootstrap
 
+## Workflow mode
+
+Full is the default. Light/Defect use `$sdlc`'s accepted compact packet as the
+plan/result; use that packet instead of separate phase docs or execution matrices.
+The current task may provision and own its one coherent change directly. Do not
+require a separate setup worker, execution task, coordinator heartbeat, or handoff
+when ownership stays in this task. Record `current-task-direct`, parent task
+`none`, and parent-context forked `no`. A compact handoff is needed only for an
+actual ownership transfer. Mode does not waive factual lane/status, protected-root,
+author, environment, or safe cleanup checks. Human code review is not a gate.
+
 Use this skill for the cheap setup pass before the main execution agent starts.
 
 In an orchestrated multi-slice wave, the coordinator spawns one bounded
@@ -45,27 +56,27 @@ forked: no`; do not manufacture a second execution task within that assignment.
 In an orchestrated multi-slice wave, each later substantive slice defaults to a
 fresh user-visible top-level task unless the reviewed plan records the explicit
 `single-task-wave-owner` exception. Use the handoff doc for every ownership
-transfer. For a newly created lane, invoke the repo provisioner with
-`-SeparateTaskHandoff` and an explicit `fresh-visible-task` or
-`fresh-manual-handoff` launch mode so it cannot silently retain the direct-owner
-default. For an accepted `serial-exclusive-lane-transfer`, do not create a
-competing worktree: verify the prior owner is review-clean, green, committed,
-and stopped; bind its exact pushed head and clean lane; then have the
-coordinator rebind the exclusive lease, task id, activation epoch, registry,
-retrieval gate, and telemetry baseline before the fresh next task writes.
+transfer. Create new lanes through the repo's maintained entrypoint; do not
+invent provisioner flags, activation calls, registries, or lease machinery.
+For an accepted serial transfer, verify the prior owner is review-clean,
+green, committed, stopped as a writer, and handing over the exact pushed head
+and clean lane. Name the next owner and owned scope in the compact handoff.
+Apply an additional lease/activation protocol only if current repo authority
+actually defines and supports one. Do not reconstruct retired machinery.
 
-For a separate-task lane, follow the consuming repo's documented provisioner
-and owner-binding flow. Keep an unbound lane read-only until the real owner is
-known and exclusive write ownership is verified. Do not reconstruct internal
-provisioner parameters or require optional telemetry to activate an otherwise
-valid owner.
+Use the consuming repo's documented agent-facing create/status entrypoints
+with their documented inputs, then verify the returned worktree. Let maintained
+commands derive optional observation details; do not assemble internal inputs.
+Task attribution/reporting and retrieval are optional diagnostics; their
+absence or failure never blocks an otherwise factual, safe handoff. Do not
+require a second provisioning call, telemetry baseline, or retrieval hash.
 
 ## Required Reads
 
 Before acting:
 
 1. read `AGENTS.md` or equivalent repo instructions;
-2. read the current execution plan, planning artifact, or lane assignment note;
+2. read the accepted plan, Light/Defect compact packet, or lane assignment note;
 3. read any repo-local worktree/bootstrap docs named there;
 4. if the repo already has a lane handoff doc, read it before replacing it.
 
@@ -79,17 +90,16 @@ Before acting:
   a second competing lane;
 - for an independent top-level execution lane, provision from current
   `origin/main` and record the exact base SHA/proof. Do not fork another worker
-  branch or context; pass only a compact handoff and targeted retrieval packet.
+  branch or context; pass only a compact handoff and useful retrieval when available.
   Shared-seam exceptions must be explicitly approved and integrated into the
   fresh lane after creation.
 - reuse an existing lane for another top-level task only when the reviewed plan
   selects `serial-exclusive-lane-transfer`. Require exact branch/worktree/base/
-  final pushed head, clean status, prior writer shutdown, released/acquired
-  exclusive lease, new activation epoch and task binding, compact handoff,
-  and compact ownership evidence. Fail closed on an ownership mismatch and
-  never allow overlapping writers. Optional diagnostics do not gate transfer.
-  This does not relax fresh-`origin/main` provisioning for
-  a new or parallel lane.
+  final pushed head, clean status, prior writer shutdown, next owner, and
+  assigned scope. Verify any additional currently supported repo ownership
+  contract. Fail closed on factual identity or competing-writer mismatches;
+  optional telemetry/retrieval failures are not mismatches. This does not relax
+  fresh-`origin/main` provisioning for a new or parallel lane.
 - keep the handoff prompt short and put durable state in the lane-local
   handoff doc.
 - for specialized architecture work, include the exact authority docs named
@@ -103,9 +113,9 @@ Before acting:
 - state that progress commentary never ends the work turn; final handoff is
   permitted only after completion criteria or a genuine blocker after all safe
   work is exhausted.
-- record provider-test authority from the consuming repo and accepted slice:
-  required provider, optional comparisons, admission rules, and paid-test
-  limits. Optional comparisons must not become hidden prerequisites.
+- for authorized provider proof, record the accepted track's repo-approved
+  provider/profile and exact-row-first repair order. Other providers are explicit
+  comparisons named by the accepted slice, never hidden prerequisites.
 
 ## Workflow
 
@@ -116,10 +126,8 @@ Before acting:
    - worktree provisioning script
    - shared coordination ledger
 3. Create or select the lane using repo rules.
-4. Run the repo status/bootstrap commands needed to make the lane usable. For a
-   separate task, follow the documented provisioner and owner-binding flow
-   using the real task id. Keep it read-only until ownership is verified;
-   optional telemetry does not determine whether activation succeeds.
+4. Run the maintained repo status/bootstrap commands needed to make the lane
+   usable. Verify Git facts independently of optional task observations.
 5. Record:
    - branch
    - worktree
@@ -128,9 +136,8 @@ Before acting:
    - owned work item
    - required docs/artifacts
    - lock or ownership state
-   - for a serial transfer: prior and next task ids, activation epoch, exact
-     pushed head, clean-lane proof, lease release/acquisition, compact handoff,
-     and optional local diagnostic closeout/new baseline
+   - for a serial transfer: prior and next owner, exact pushed head, clean-lane
+     proof, prior writer shutdown, and any actually supported ownership contract
 6. Write or refresh the lane-local handoff doc.
 7. Return a minimal handoff prompt that points the next agent at:
    - branch
@@ -158,17 +165,12 @@ Mode: writable | read-only
 Launch mode: current-task-direct | fresh-visible-task | fresh-manual-handoff | bounded-subagent
 Parent thread id: none | <id>
 Parent-context forked: no
-Activation epoch:
+Additional repo ownership contract, only if currently supported:
 Prior owner task id, when serial transfer:
 Exact prior pushed head, when serial transfer:
-Next owner task id, when serial transfer: pending bootstrap_wait | <id>
-Lane registry path and bound lane identity, when serial transfer:
-Retrieval packet path, when supported:
-Prior owner telemetry closeout, when enabled (nonblocking):
-Next owner telemetry baseline, when enabled (nonblocking):
-Exclusive lease release evidence, when serial transfer:
-Exclusive lease acquisition evidence, when serial transfer:
-Activation state, when serial transfer: bootstrap_wait | active
+Next owner task id, when serial transfer: pending | <id>
+Prior owner stopped as a writer, when serial transfer:
+Optional useful retrieval reference or local limitation:
 Owned work item:
 Required reads:
 - AGENTS.md
@@ -187,7 +189,7 @@ Result path:
 Lock / ownership state:
 Serial transfer verification, when applicable: pending | verified
 Prior owner stopped and clean exact-head proof, when serial transfer:
-Task/epoch/registry/ownership binding verification, when serial transfer:
+Factual lane/head/owner verification, when serial transfer:
 Open risks:
 Next safe action:
 Execution directive: Treat this as one uninterrupted assigned-slice task, not a
@@ -200,11 +202,10 @@ do not begin the next substantive slice unless the reviewed plan records the
 explicit `single-task-wave-owner` exception.
 ```
 
-`pending bootstrap_wait` is permitted only while the coordinator obtains the
-real next task id and completes the transfer bindings. The next task must not
-enter `active` or write until required ownership fields are filled, verified,
-and consistent with the lane registry or documented ownership mechanism.
-Optional retrieval and telemetry fields do not prevent activation.
+A pending next owner does not authorize overlapping writers. Before writing,
+the receiver verifies its assigned branch/worktree/head, prior writer shutdown,
+and scope, plus any current supported repo ownership protocol. Optional
+diagnostics are not activation fields or handoff gates.
 
 Keep this doc current. If a lane changes branch, worktree, or ownership, update
 the doc before handing off.
@@ -241,20 +242,16 @@ Report only:
 
 ## Telemetry Tool Failure Logging
 
-Telemetry, retrieval diagnostics, command journals, and accounting captures are
-optional local debugging data. When an enabled telemetry operation fails,
-record one local incident and do not retry it merely to improve paperwork.
-Keep raw output gitignored and out of formal closeout.
-
-This does not waive a substantive launch/lease, review, product verification,
-security, Git-head, or protected-merge failure independently established
-without telemetry. Missing retrieval, reporting, or accounting telemetry alone
-is non-blocking.
+Attempt an enabled observation once. Preserve failures locally and use a
+maintained repo incident logger when available. Retrieval, attribution,
+reporting, and telemetry are nonblocking diagnostics; do not reconstruct them
+or invent unavailable loggers, registries, or wrappers. Actual checkout,
+competing-writer, review, product, security, Git-head, merge, or filesystem
+cleanup failures remain substantive failures on their own merits.
 
 ## Accounting Telemetry Failure Rule
 
-If accounting telemetry is enabled, attempt it once. On failure, record one
-local `telemetry_incomplete_non_product` incident and do not retry, reconstruct,
-replay, backfill, or create an evidence-only commit. Continue through the
-independently validated product, review, Git, and merge gates. Accounting
-telemetry never changes the completion claim.
+Attempt enabled accounting once. Record one local limitation if it fails;
+never retry, reconstruct, backfill, or commit raw accounting to make it green.
+Continue through independently validated product, review, Git, and authorized
+closeout gates. Do not require a retired accounting wrapper or receipt.

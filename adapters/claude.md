@@ -19,16 +19,18 @@ Before doing phase work, read the relevant subskill `SKILL.md` and follow that s
 
 ## Subagents
 
-If Claude subagents are available, use them for required independent review gates. If they are not available, use a separate fresh Claude session or a human reviewer and record that choice in the planning/progress artifact.
+If Claude subagents are available, use them for required independent LLM review
+gates. Otherwise use a separate fresh LLM session or report the tooling blocker.
+Do not introduce a mandatory human code-review fallback. Human involvement is
+AC confirmation and support for unresolved product/design/architecture decisions.
 
 Do not paste full chat history into routine reviewers. Give the reviewer a compact packet:
 
 - current diff or commit
 - changed files
 - assigned Product AC, Technical AC, and Negative AC rows
-- AC trace rows
-- final AC verification matrix rows and required proof depth
-- clean-code retirement expectation and inventory/proof when applicable
+- mode-specific proof: Full trace/matrix rows, or Light/Defect compact AC/proof table
+- cleanup expectation: Full retirement inventory, or bounded inline disposition
 - planned tests and focused test results
 - relevant plan excerpt
 - open findings or deferrals

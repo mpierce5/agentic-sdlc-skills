@@ -5,6 +5,24 @@ description: Merge reviewed work to main using protected-root-safe closeout rule
 
 # Golden Merge
 
+## Workflow mode and reviewer authority
+
+Full is the default. Light/Defect use the accepted compact packet and its AC/proof
+table instead of separate execution plans/matrices. All modes require independent
+LLM code review, explicit architecture-conformance and cleanup CLEAN, and
+acceptance verified from inspected outcome proof. Code-review CLEAN with pending
+verification alone is insufficient. No human code-review or routine human merge
+approval gate is added; ask humans only about unresolved AC/design/architecture
+decisions or externally required authorization. Invoke this skill only when
+merge/rollout is authorized; mode selection itself does not authorize it.
+
+Bounded work may keep scope, review, proof, and result in one artifact and retire
+leftovers inline. Do not demand Full planning phases, a separate retirement slice,
+or qualification-specific paperwork for unrelated work. Keep protected-root,
+current-main impact assessment, PR, author, and applicable golden/provider gates.
+Repo-owned lane-finish commands take precedence over the generic retirement
+commands below. Do not manually reconstruct a repo's supported closeout route.
+
 Use this skill for merge and rollout closeout after implementation or planning
 work is already reviewed and ready.
 
@@ -112,8 +130,11 @@ Run this sequence:
 7. Run the required impact-based verification on the integrated branch.
 8. Push the verified branch and open or update the PR if the repo uses one.
 9. Merge through the repo-approved path.
-10. Complete concise merge closeout in the lane:
-    - update the lane result or handoff artifact with final status
+10. Record factual merge closeout in the existing repo-supported result surface
+    (for example the PR body), without dirtying the finished lane or creating an
+    evidence-only follow-up commit. Commit review/proof signoff before step 9;
+    record post-merge head, sync, and removal facts after they occur:
+    - update the existing result or handoff surface with final status
     - for LLM-facing work, record whether review confirmed
       provider-agnostic reusable source, generic contract wording, and
       deterministic runtime ownership of already-known contract values
@@ -125,38 +146,57 @@ Run this sequence:
     checkout by fetch/pull from the merged `origin/main`.
 12. Verify the protected root is clean, on `main`, tracking `origin/main`, and
     at the expected commit.
-13. Retire the completed lane when its cleanup preconditions pass.
+13. Retire the completed lane and verify its directory and Git registration are
+    absent. Record removed/not-applicable, or an explicit retained/blocked
+    disposition with reason, next action, and owner. Do not report full closeout
+    complete while filesystem cleanup remains unresolved.
 
 ## Lane Retirement
 
-Retire a lane only after its merged closeout evidence has landed on `main` and
-the protected root has synchronized to that merge.
+Retire after the reviewed task head was merged through the repo-approved PR path,
+its pre-merge signoff is included, and the protected root has synchronized to the
+resulting integration head. Record factual post-merge
+and removal status in the existing repo-supported closeout surface; do not
+require those later facts to land through another commit/merge before cleanup.
 
 Before removal, prove all of the following:
 
-- the task branch is an ancestor of `origin/main`;
-- the lane ledger row is `merged`, `completed`, or `inactive` with a final
-  result/closeout artifact;
+- the task branch is an ancestor of `origin/main`, or the repo-approved
+  squash/rebase PR merge is verified: the PR's merged head equals the current
+  reviewed task head and its resulting integration commit/head is reachable from
+  `origin/main`. A branch advanced after that merge is not disposable from the
+  old PR status;
+- committed review/proof and factual merge status are present in the existing
+  result/closeout surface; optional or stale ledger observations do not gate removal;
 - the target worktree has no tracked or untracked task changes;
 - no worker or reviewer still needs the lane for a same-slice fix or review.
 
-Run retirement from a coordinator context outside the target worktree. Do not
-try to remove the worktree that is the current process directory. A protected
-root or a dedicated cleanup worktree may issue the Git maintenance commands,
-but must not make task-owned edits.
+The same slice owner runs retirement from a working directory outside the
+target worktree. Do not remove the current process directory. No coordinator
+takeover or new cleanup lane is required. A protected root may issue the
+maintained closeout/Git maintenance commands without task-owned edits.
 
 Use this order:
 
 1. `git -C <lane> status --short`
-2. `git -C <repo-root> merge-base --is-ancestor <branch> origin/main`
+2. Check ancestry with `git -C <repo-root> merge-base --is-ancestor <branch> origin/main`;
+   for a squash/rebase merge, verify the PR/head/result identity described above instead.
 3. `git -C <repo-root> worktree remove <lane>`
-4. `git -C <repo-root> branch -d <branch>`
+4. Attempt `git -C <repo-root> branch -d <branch>`; if it refuses after a verified
+   squash/rebase merge, preserve the local branch and record it. Branch retention
+   does not require retaining the already disposable worktree directory.
 5. Delete the remote branch only when the PR merge did not already delete it.
 
-Never use `--force`, `git branch -D`, or a destructive clean command for lane
-retirement. If any precondition fails, leave the worktree and branch in place,
+For generic Git retirement, never use `--force`, `git branch -D`, or a destructive
+clean command. Repo-owned finish commands retain their documented exact-target
+behavior and take precedence. Stop only owned servers/watchers before removal;
+verify actual directory absence, not only command success or branch deletion.
+If any precondition fails, leave the worktree and branch in place,
 record the exact blocker in the result/ledger, and hand cleanup back to the
-coordinator.
+responsible owner. Use the consuming repo's documented partial-cleanup status
+and safe retry/recovery entrypoint after owned locks clear, when supported.
+Never rebuild a local safety record from optional telemetry. Orphan inventory
+entries are candidates for ownership assessment, not deletion authority.
 
 Close temporary reviewer/subagent sessions after their results are accepted.
 Keep a user-visible implementation task available unless the user explicitly

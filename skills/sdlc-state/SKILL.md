@@ -1,15 +1,38 @@
 ---
 name: sdlc-state
-description: Maintain a compact, durable SDLC execution state file without replacing the existing phase-gated planning, independent review, verification, or progress-doc behavior. Use when creating or updating `.sdlc/state.json` for an SDLC wave.
+description: "Maintain a compact execution index for Full, Light, or Defect SDLC work. Preserve the selected mode's gates and distinguish code-review status from acceptance proof; bounded modes may use their packet without a separate state file."
 ---
 
 # SDLC State
+
+## Mode-aware state
+
+Full is the default; missing `workflow_mode` in legacy state means `full`. Add
+`current.workflow_mode: full | light | defect` without rewriting old history.
+Light/Defect may use their single compact packet as the only state record; do
+not create this file solely to satisfy a bounded workflow. When the repo already
+uses this index, point `context.plan_doc` and `context.progress_doc` to that same
+packet and use `phase: compact-packet | slice-implement | slice-review |
+verification | finalize`. Record `phase_gate: compact_packet` for combined
+planning, not fictitious Full-phase completions or skipped-gate waivers.
+
+Keep `context.code_review_status: pending | CLEAN | FINDINGS` separate from
+`context.acceptance_status: pending | verified | partial | blocked`, plus
+`context.architecture_conformance: pending | CLEAN | FINDINGS` and
+`context.cleanup_status: pending | CLEAN | FINDINGS`. Legacy `review_status`
+summarizes code review; it never implies acceptance verified. Only inspected
+outcome proof closes AC, permits green completion, or supports merge readiness.
+The Full matrix remains authoritative in Full; the compact AC/proof table is
+authoritative in Light/Defect. No state field creates a human code-review gate.
 
 Use this skill to create or update the SDLC state file. State is a machine-readable execution index, not the full plan and not the source of product rationale.
 
 ## Core Rule
 
-Preserve the existing SDLC behavior. State may help resume, skip already-green unchanged work, and pass compact context to agents. It must not remove requirements discovery, Phase 0 refactor-health, functional planning, technical planning, execution planning, independent reviews, review/fix loops, or verification gates.
+Preserve the selected mode's SDLC behavior. State may help resume and reuse
+unchanged green proof; it cannot waive that mode's required reviews, proof, or
+shared safety gates. Full retains its separate refinement/planning phases.
+Light/Defect combine planning in their compact packet by design.
 
 ## File
 
@@ -21,8 +44,9 @@ Default path: `.sdlc/state.json` unless the repo defines another path. Create or
 {
   "current": {
     "task_id": "string",
-    "phase": "requirements | phase0 | functional-plan | technical-plan | execution-plan | slice-implement | slice-review | clean-code-retirement | verification | finalize",
-    "phase_gate": "not_applicable | draft | review_pending | reviewed | updated_from_review | committed",
+    "workflow_mode": "full | light | defect",
+    "phase": "compact-packet | requirements | phase0 | functional-plan | technical-plan | execution-plan | slice-implement | slice-review | clean-code-retirement | verification | finalize",
+    "phase_gate": "compact_packet | not_applicable | draft | review_pending | reviewed | updated_from_review | committed",
     "slice_id": "string | null",
     "status": "not_started | in_progress | blocked | review_pending | review_clean | verification_pending | green | deferred",
     "depth": "SHALLOW | DEEP",
@@ -36,6 +60,10 @@ Default path: `.sdlc/state.json` unless the repo defines another path. Create or
     "files_changed_count": 0,
     "last_commit": "sha | null",
     "review_status": "pending | blocking_findings | review_clean | deferred | no_fix",
+    "code_review_status": "pending | CLEAN | FINDINGS",
+    "architecture_conformance": "pending | CLEAN | FINDINGS",
+    "cleanup_status": "pending | CLEAN | FINDINGS",
+    "acceptance_status": "pending | verified | partial | blocked",
     "verification_status": "not_run | focused_passed | broad_passed | failed",
     "ac_signoff_status": "unchecked | partial | blocked | signed-off | deferred | not_applicable",
     "clean_code_retirement_status": "not_applicable | pending | clean | leftovers_found | deferred"
@@ -51,7 +79,8 @@ Default path: `.sdlc/state.json` unless the repo defines another path. Create or
 - do not store raw logs, raw browser output, long diffs, full test output, chain-of-thought, or broad summaries
 - store paths, counts, hashes, commit ids, command names, and terse status values instead of large content
 - current state is a convenience execution index for resume and routing; approved repo planning artifacts, checklists, review artifacts, and verification records remain authoritative for gates
-- state may summarize AC signoff status, but the final AC verification matrix in the planning/progress artifact remains authoritative
+- state may summarize AC signoff; the mode-specific matrix or compact AC/proof
+  table in the planning/progress artifact remains authoritative
 - history is audit/debug only
 - never recompute current state from history when `current` exists
 - read history only for repeated failures, disputed findings, resume/debug work, or explicit user request
@@ -95,4 +124,5 @@ Clean-code retirement payload:
 - history has a concise entry for the latest material transition
 - large artifacts are referenced, not embedded
 - progress/planning docs remain current for human-readable decisions and resume context
-- any state AC signoff summary agrees with the authoritative final AC verification matrix
+- any state AC signoff summary agrees with the selected mode's authoritative
+  final matrix or compact AC/proof table

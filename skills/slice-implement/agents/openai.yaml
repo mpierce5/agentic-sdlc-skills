@@ -1,4 +1,4 @@
 interface:
   display_name: "Slice Implement"
   short_description: "Implement and commit exactly one slice"
-  default_prompt: "Use the slice-implement skill to implement exactly one reviewed execution-plan slice with tests first, targeted verification, prerelease cleanup posture, and an immediate commit when the slice is green. Work only in the selected task branch/worktree; never create, stage, or commit task-owned code, docs, state, or progress changes from the canonical/shared root checkout, which must stay clean on `main` and update only by fetch/pull from `origin/main`. Before coding, identify the slice's Product AC, Technical AC, Negative AC, trace-table rows, final AC verification matrix rows, affected files, planned tests, required proof depth, and expected AC coverage verdict; pass that compact AC/TAC and AC-signoff packet to slice-review. Update the final AC verification matrix before committing."
+  default_prompt: "Use $slice-implement for one Full slice or explicit Light/Defect compact change; obtain independent LLM code review, targeted proof, and acceptance verification before committing."

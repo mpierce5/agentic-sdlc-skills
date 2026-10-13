@@ -31,9 +31,8 @@ For routine review, spawn reviewers without full-context forking. Pass compact c
 - current diff or commit
 - changed files
 - assigned Product AC, Technical AC, and Negative AC rows
-- trace-table rows
-- final AC verification matrix rows and required proof depth
-- clean-code retirement expectation and inventory/proof when applicable
+- mode-specific proof: Full trace/matrix rows, or Light/Defect compact AC/proof table
+- cleanup expectation: Full retirement inventory, or bounded inline disposition
 - planned tests and verification status
 - unresolved prior findings
 - review mode and model tier
@@ -48,18 +47,16 @@ Choose concrete models according to availability in the current Codex environmen
 
 Record the concrete model used in the planning/progress artifact when review independence matters.
 
-The active local rules at the refresh used these concrete assignments:
+Concrete model names and reasoning come from the current host's exposed model
+list and consuming-repo routing policy. Do not retain historical model names as
+launch defaults. If required routing is unavailable, follow the host's escalation
+policy rather than silently substituting another tier. Risk alone does not
+require the most expensive model when the documented review model is sufficient.
 
-- bootstrap: `gpt-6-luna`, medium reasoning
-- writable slice owner: `gpt-6-terra`, medium reasoning
-- routine review: `gpt-6-terra`, medium reasoning
-- deep, acceptance, or guardrail-sensitive review: `gpt-6-terra`, high reasoning
-
-These names are adapter defaults, not availability guarantees. Check the host's
-exposed model list before selecting them. If a named model is unavailable, use
-the documented repo mapping or select an available model capable of the tier
-when host policy permits selection, and record the substitution. Never issue
-an unsupported model assignment or silently weaken a required review tier.
+Human review concerns AC and unresolved product/design/architecture decisions.
+An unavailable LLM reviewer is a tooling blocker, not a mandatory human
+code-review fallback. Light/Defect use one combined reviewer and its evidence
+follow-up; they do not inherit Full's refinement bench or extra execution tasks.
 
 ## Context Isolation And Progress
 

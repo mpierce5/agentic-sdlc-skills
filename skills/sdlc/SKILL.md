@@ -1,9 +1,50 @@
 ---
 name: sdlc
-description: "Coordinate a phase-gated prerelease product workflow across the narrower SDLC skills. Use when the user wants a feature, refactor, UX change, bug fix, contract change, or implementation wave refined, planned, reviewed, implemented slice by slice, verified, and closed with durable artifacts. This skill is the orchestrator: it must create and follow an explicit checklist, load the relevant phase skill before each phase, enforce gates, and prevent skipping required reviews or confirmations."
+description: "Coordinate the human-directed SDLC workflow in Full (default), explicit Light for small additions, or explicit Defect for established-behavior repairs. Own mode selection, required LLM reviews, outcome proof, and authorized closeout through the related phase skills."
 ---
 
 # SDLC
+
+## Workflow mode and human involvement
+
+Full is the default. Select Light only when the user explicitly requests Light,
+a lightweight/quick small-change workflow, or an accepted continuation packet
+records `workflow_mode: light`. Select Defect only when the user explicitly
+requests Defect, the bounded defect fast path, or an accepted packet records
+`workflow_mode: defect`. A bug request alone does not silently change the default.
+An omitted mode, including legacy state, means `full`. Record the selected mode
+and its eligibility rationale before phase work. Examples: `$sdlc`, `$sdlc light`,
+`$sdlc defect`, and `$implement` with an accepted mode-specific packet.
+
+For Full, follow the full phase workflow below. For Light or Defect, follow
+"Light and Defect workflow" below and load only `$worktree-setup`,
+`$slice-implement`, `$slice-review`, `$sdlc-state` when needed, and
+`$golden-merge` when merge is authorized. Full-only research, refinement,
+phase-document, trace-table, matrix, retirement-slice, and multi-task requirements
+do not become bounded-mode gates through a subskill. Do not mark combined work
+as skipped or demand a gate-waiver approval.
+
+Human review concerns the correctness of AC and design/architecture decisions
+the LLM cannot safely resolve. Review the AC with the user when they are new,
+ambiguous, or materially changed; reuse acceptance already present in the user's
+request or an approved artifact. Full retains requirements confirmation, but
+does not require redundant confirmation of already accepted AC. Independent
+code, architecture-conformance, and acceptance reviews are LLM reviews. Never
+require a human to inspect code, approve routine implementation, or approve
+routine merge merely because a review gate exists. Ask for support only for a
+specific unresolved product/design/architecture decision or independently required
+external authorization. An LLM-tool outage is not a human-code-review fallback.
+
+All modes retain repo-approved lane ownership, protected-root safety, independent
+LLM review, outcome-level proof, security/privacy/domain-authority rules, provider
+authorization and qualification, impact-based evidence reuse, and authorized
+PR/merge closeout. A mode changes process depth, not action permissions.
+
+Across all modes, code-review CLEAN permits targeted verification while
+acceptance remains pending. After checks pass, the same LLM reviewer inspects
+the proof summary before marking acceptance verified. Missing planned proof
+does not block initial code review; code-review CLEAN alone never permits
+green completion or merge. Use `$slice-review`'s separate verdicts.
 
 Use this skill as the human-directed workflow owner for prerelease product
 work. That owner may be:
@@ -76,7 +117,7 @@ Immediately create an explicit checklist before doing substantial phase work.
 Use the platform plan tool when available. Exactly one checklist item may be
 `in_progress` at a time.
 
-Default full-run checklist:
+Full-mode checklist (Light/Defect use their compact checklist):
 
 1. Worktree setup discovery with `$worktree-setup`
 2. Initial problem framing and required external-practice research brief
@@ -119,7 +160,7 @@ reason.
 If the user asks for only one phase or a resumed phase, create the smaller
 checklist needed for that phase.
 
-## Research Gate
+## Research Gate (Full mode)
 
 Treat external-practice research as a required decision gate, not a preamble.
 It exists to prevent the team from rediscovering settled engineering practice,
@@ -161,45 +202,109 @@ requirements artifact records a passing research gate and AC-evidence review.
 If later discovery changes a material decision, reopen the focused research
 gate and revise the affected AC before proceeding.
 
-## Bounded Defect Fast Path
+## Light and Defect workflow
 
-Use this path instead of the default full-run checklist when all of the
-following are true:
+### Eligibility
 
-- the user asks to fix a concrete observed defect and authorizes implementation;
-- the intended behavior is already established, so no new product, UX,
-  product, security, privacy, or ownership semantics must be chosen;
-- the repair is expected to fit one implementation slice in known architecture
-  seams;
-- the change does not introduce a new public contract, data migration, or broad
-  cross-system redesign.
+- **Light:** one small, coherent addition or improvement with clear AC, an
+  existing supported implementation pattern, and a bounded, understood impact.
+  Minor new local behavior is allowed; a novel architectural pattern is not.
+- **Defect:** a concrete observed failure whose intended behavior is established
+  by an existing contract, accepted AC, or the user's explicit expected outcome.
+  The repair fits one known architecture seam and does not invent semantics.
+- Neither mode permits a new public contract, migration, material authority or
+  security/privacy change, broad redesign, or multiple independently risky slices.
+  File count and line count are signals, not eligibility rules. A known adapter
+  or golden path does not alone require Full.
 
-Create this smaller checklist:
+The former Bounded Defect Fast Path is the Defect mode. Its former extra
+preimplementation packet-review gate is replaced by the combined final LLM
+review; request early LLM design review only for a concrete uncertainty. It is
+not an automatic default for every bug report.
 
-1. Worktree/lane setup and defect evidence capture
-2. Compact defect packet with scope, Product AC, Negative AC, architecture seam,
-   targeted proof, and explicit deferrals
-3. Bounded architecture-fit check and independent review of the packet
-4. One-slice implementation
-5. Independent slice review and fixes
-6. Targeted verification plus regression proof
-7. Slice commit and requested merge/deployment closeout
+### Compact packet and checklist
 
-The compact defect packet replaces separate requirements, Phase 0, functional,
-technical, and execution-plan documents. Record those separate phases as
-`combined in bounded defect packet`, not silently skipped. A separate user
-confirmation gate is unnecessary when the user already stated the expected
-behavior, narrowed the scope, and explicitly authorized the fix.
+Use one durable change/defect packet in the selected lane (or a repo-approved
+issue/PR artifact). It is the accepted plan, progress record, and result; do not
+create separate requirements, Phase 0, functional, technical, execution, trace,
+matrix, verification-budget, or review-journal documents. Record:
 
-Escalate immediately to the default full workflow when investigation reveals
-new semantics, multiple independently risky slices, a migration, an unknown
-architecture boundary, or material security/privacy/ownership impact. Do not
-escalate merely because the repository is large, tests are slow, or the defect
-touches a golden path with an established adapter pattern.
+- mode, scope, exclusions, eligibility rationale, and AC acceptance source;
+- outcome-level Product AC and relevant Negative/Technical AC, each with its
+  proof boundary, planned check, final evidence and disposition in one small table;
+- affected seam/owner, existing pattern, guardrails, and verification impact;
+- for Defect: actual vs. expected behavior, reproduction/captured failure,
+  diagnosed cause, repair boundary, and regression proof;
+- independent LLM code-review, architecture-conformance, cleanup, and acceptance
+  verdicts; final commit and requested PR/merge status with limitations.
+
+Create this short checklist:
+
+1. Verify lane and mode eligibility; capture defect evidence when applicable.
+2. Capture compact scope/AC/pattern/proof packet; resolve only material open decisions.
+3. Implement one coherent change; remove introduced/obsoleted leftovers inline.
+4. Independent combined LLM code/architecture/cleanup review; fix and re-review findings.
+5. Targeted outcome/regression verification; reviewer inspects the proof summary.
+6. Commit the verified change and concise result; complete authorized closeout.
+
+The current task remains the direct owner. No coordinator, separate execution
+task, setup worker, handoff, heartbeat, or state file is required solely by the
+mode. Use compact no-parent-context reviewer packets. A preimplementation
+packet commit and repeated phase commits are unnecessary; combine the formal
+packet/result with the coherent implementation commit unless repo rules require
+otherwise. Record combined planning as `compact_packet`, not skipped phases.
+
+### Proof and review
+
+For logic defects, prefer a regression test that fails on the original behavior
+and passes after repair. Use existing adequate tests, a browser/visual check, or
+another reproducible check when that proves the promised boundary better; do
+not invent unit tests for reversible copy/spacing edits. Preserve captured
+failure evidence when exact pre-fix replay is unavailable and explain the limit.
+
+Inspect only the affected architecture seam. Keep no-net-worsening guardrails;
+do not require repo-wide hotspot inventories or opportunistic refactors. Cleanup
+of this change is part of the final diff review, not a separate retirement slice.
+
+Routine bounded changes need no independent planning bench. The single combined
+LLM reviewer covers correctness, AC drift, architecture conformance, cleanup,
+and final acceptance. Record `code_review: CLEAN | FINDINGS` separately from
+`acceptance: pending | verified | partial | blocked`. Code-review CLEAN permits
+targeted verification; it never signs off unproven AC or authorizes merge alone.
+After checks pass, the same reviewer inspects the concise proof summary and
+signs off the AC. This is an evidence follow-up, not a second complete diff
+review. Material fixes or changed boundaries require affected re-review/proof.
+
+Use impact-based verification and retain unchanged passing proof. Never weaken
+an expectation to make a failure pass. LLM/provider qualification and captured
+semantic failures retain the repo's exact-row-first repair/fresh-target loop;
+mode selection does not authorize paid calls or reduce required fresh counts.
+
+### Escalation and completion
+
+If eligibility fails, record the concrete risk, move to Full, and activate only
+the missing research/refinement/planning/review gates. Preserve accepted AC,
+diagnosis, valid review, and unchanged proof. Do not restart merely for different
+document names. Ask the user only when AC changed or an unresolved decision
+needs support, not for permission to perform routine risk escalation.
+
+Complete only with the final affected diff independently LLM-reviewed, explicit
+architecture and cleanup CLEAN, all required AC proven and evidence inspected,
+the coherent change committed, and requested closeout truthfully recorded.
+Code cleanup CLEAN is distinct from worktree removal. Every mode must inspect
+the filesystem closeout outcome via `$worktree-setup`: removed/not-applicable,
+or a specific retained/blocked reason, next action, and owner. Routine merged
+lanes are removed; stop only owned servers/watchers first. A directory still
+present after partial removal is a substantive cleanup failure, not telemetry.
+Keep this disposition in the existing packet/result, without another document.
+If merge is authorized, use `$golden-merge`; otherwise retain the reviewed lane
+and report the implemented commit. No human code-review gate is added.
 
 ## Review, Verification, And Evidence Defaults
 
-Keep the existing review gates:
+Full retains the existing refinement and acceptance gates below. Light and
+Defect combine those responsibilities as specified above. All reviewers here
+are independent LLM reviewers; human AC/design support is separate.
 
 - refinement uses proportional, phase-level TPM and architect review. Treat the
   complete phase artifact or a genuinely semantic delta as the review unit.
@@ -211,8 +316,8 @@ Keep the existing review gates:
   reviewer finding. One CLEAN consolidated TPM+architect pass closes the phase;
 - implementation normally uses independent slice review before targeted
   verification. An authorized repair of an already captured LLM semantic
-  failure is the narrow exception: after the generic fix and only the minimum
-  provider-free safety/admission check, replay that exact failed row first and
+  failure is the narrow exception: after the generic fix, replay that exact
+  failed row immediately through the maintained runner and its built-in guards;
   iterate until GREEN, then run the fresh configured unseen group on the
   candidate branch. Perform independent review and the remaining affected
   deterministic verification only after those live proofs are GREEN;
@@ -232,10 +337,13 @@ cross-system risk; final acceptance alone does not imply one.
 LLM/provider tests are not part of the standard suite. Run only impacted rows
 when the user authorizes them, the accepted plan explicitly requires them, or
 the changed behavior is materially model/provider-dependent and deterministic
-proof cannot establish the boundary. For a new scenario, run the minimum
-provider-free safety/admission proof first. For an already captured semantic
-failure, make the narrow generic fix, replay that exact failed LLM row
-immediately after the minimum safety check, and iterate it until GREEN. Then
+proof cannot establish the boundary. For qualification scenarios, rely on the
+maintained runner's built-in immutable packet, admission, provider, and ledger
+guards; do not run a separate deterministic command before transport. For an
+already captured semantic failure, make the narrow generic fix and immediately
+replay that exact failed LLM row through those guards until GREEN. Do not insert
+syntax/unit/typecheck/admission commands, review, or docs between repair, exact
+replay, and the complete fresh target. Then
 run the fresh configured unseen qualification group on the candidate branch
 before independent review, broader deterministic checks, or merge. If review
 changes provider-visible behavior, rerun the affected diagnostic and unseen
@@ -300,7 +408,9 @@ the setup agent does not implement the slice.
 
 ## Hard Gates
 
-Treat this workflow as gated, not advisory.
+Treat this workflow as gated, not advisory. Full-only phase, document, matrix,
+and separate retirement-slice gates below apply only to Full. Light/Defect use
+their compact equivalents above; shared safety and proof gates apply to all modes.
 
 - start with worktree setup discovery unless the user explicitly narrowed or
   resumed the task
@@ -314,19 +424,20 @@ Treat this workflow as gated, not advisory.
 - provision every newly created independent top-level refinement or
   implementation lane from current `origin/main` in a fresh isolated worktree.
   Do not base a new lane on another worker branch or fork/copy that worker's
-  chat context; use the lane-local handoff and bounded retrieval packet instead.
+  chat context; use the lane-local handoff and useful retrieval when available.
   A shared-seam integration exception must name its exact commit, reason,
   locks, and merge order, and is merged into the fresh lane after provisioning.
 - a fresh visible next-slice owner may take over an existing
   `serial-exclusive-lane-transfer` lane only after the prior owner is
   review-clean, green, committed, and fully stopped as a writer. The durable
   handoff must bind the exact branch/worktree/base/final pushed head, clean
-  status, released exclusive lease, and next slice. Before activation, the
-  coordinator must bind the new task id, activation epoch, exclusive lease, and
-  handoff/result paths; the new owner must verify those ownership identities
-  before writing. Optional retrieval and telemetry diagnostics remain local and
-  are not activation gates. No parent chat is inherited,
-  no two tasks may hold the write lease, and any mismatch fails closed. This
+  status, prior writer shutdown, next owner/slice, and handoff/result paths.
+  The receiver verifies these facts before writing and follows any additional
+  ownership protocol actually defined and supported by current repo authority.
+  Do not reconstruct retired provisioners, registries, or lease tooling.
+  Optional retrieval and telemetry diagnostics remain local, not activation
+  gates. No parent chat is inherited, no two tasks may write the same owned
+  scope, and factual identity or competing-writer mismatches fail closed. This
   narrow ownership transfer does not authorize a new parallel lane to start
   from another worker branch; parallel or newly created lanes still use the
   fresh-`origin/main` rule plus explicitly reviewed prerequisite integration.
@@ -348,8 +459,9 @@ Treat this workflow as gated, not advisory.
   reviewed and updated
 - do not start execution planning until the technical plan was independently
   reviewed and updated
-- do not start implementation until the execution plan was independently
-  reviewed, updated, committed, and accepted
+- in Full, do not start implementation until the execution plan was independently
+  reviewed, updated, committed, and accepted; in Light/Defect, use the accepted
+  compact packet without a separate execution-plan or planning-review gate
 - do not create planning, slice, merge, or release-bound commits until the
   selected checkout's git author passes repo deployable-author rules when they
   exist
@@ -387,7 +499,9 @@ Treat this workflow as gated, not advisory.
 - if the user explicitly asks to skip a gate, record the skipped gate and the
   reason in the checklist and planning artifact
 
-When in doubt, stop and ask the user.
+Resolve routine implementation questions through repo authority and LLM review.
+Ask the user only for unresolved AC/product/design/architecture decisions or
+required external authorization; do not create a human code-review gate.
 
 ## Main, PR, And Database Integration Order
 
@@ -446,7 +560,10 @@ non-overlapping upstream changes do not invalidate unrelated passing evidence.
 
 ## AC Signoff Standard
 
-The AC trace table is planning traceability, not final signoff. Every
+Light/Defect use their single compact AC/proof table. The remaining matrix and
+trace requirements in this section apply to Full only.
+
+The AC trace table is planning traceability, not final signoff. Every Full-mode
 implementation wave must maintain a final AC verification matrix that records
 for each row:
 
@@ -477,7 +594,7 @@ journals, caches, and generated corpora in local gitignored storage. Formal
 results summarize the executed check, outcome, relevant identity, and
 limitations without embedding raw payloads.
 
-Before implementation starts, the planning artifact must capture:
+In Full, before implementation starts, the planning artifact must capture:
 
 - approved scope
 - Product AC, Technical AC, and Negative AC
@@ -548,11 +665,11 @@ Execution-context isolation is a hard gate, not a preference:
   not an unrecorded or inherited-context exception;
 - if execution is being handed from one task to another, the receiving
   implementation or continuation worker must start from a compact lane-local
-  handoff and bounded retrieval packet rather than inherited parent chat;
-- when that handoff reuses a serial-exclusive lane, the receiving task must
-  also prove exact-head continuity and the coordinator's exclusive-lease,
-  activation-epoch, and ownership-registry rebinding before it writes; absent
-  that proof, provision a fresh lane instead;
+  handoff and optional useful retrieval rather than inherited parent chat;
+- when a handoff reuses a serial-exclusive lane, prove exact-head continuity,
+  clean status, prior writer shutdown, next owner/scope, and any actually
+  supported repo ownership protocol before writing; absent factual continuity,
+  provision a fresh lane instead. Optional diagnostics do not replace these facts;
 - when a host cannot create a visible task, return the minimal handoff prompt
   only if a separate task handoff is actually required. Do not substitute an
   inherited-context subagent for full execution;
@@ -604,8 +721,9 @@ Default routing comes from the active platform adapter or repo-local policy:
   limits come from the consuming repo and accepted plan.
 
 The implementation agent must not be the only reviewer of its own work. If
-independent review tooling is unavailable, use a separate fresh reviewer session
-or a human reviewer and record that plainly in the planning/progress artifact.
+independent LLM review tooling is unavailable, use a separate fresh LLM reviewer
+session or report the tooling blocker. Do not substitute a mandatory human
+code-review gate.
 
 Visible-thread rule:
 
@@ -627,21 +745,17 @@ Visible-thread rule:
 - if it is available, prefer the prepared-lane handoff flow:
   1. spawn a bounded no-parent-context lane/bootstrap setup agent;
   2. have that setup agent procure the fresh `origin/main` worktree and write
-     or refresh the lane-local handoff/retrieval packet;
+     or refresh the lane-local handoff, with retrieval only when useful and available;
   3. return or record the branch, worktree, result-path, handoff-doc path, and
      lock details;
   4. create the visible top-level execution thread directly from the current
      session;
-  5. send only a minimal handoff prompt that tells the new thread to run lane
-     status, read the handoff and any available retrieval packet, and remain
-     read-only until exclusive ownership is bound;
-  6. use the consuming repo's documented owner-binding entrypoint with the
-     returned real task id. Never substitute a coordinator id, guessed future
-     id, undocumented internal call, or hand-authored ownership-registry patch.
-     If no registry tooling exists, record and verify exclusive ownership in
-     the durable handoff. Optional retrieval hashes and telemetry are not
-     activation gates;
-  7. only after ownership is verified may the task perform writable slice work;
+  5. send a compact prompt directing the actual assigned owner to enter the
+     worktree, run status, read the handoff, verify branch/head and ownership,
+     then execute its authorized scope. Useful retrieval is optional;
+  6. follow only currently supported repo ownership/activation tooling, if any.
+     Do not require retired provisioner flags, packet hashes, registry patches,
+     telemetry baselines, or a second setup invocation;
 - never use a context-forked subagent as a substitute for a full-slice
   execution task, whether that task stays in the current thread or moves to a
   new one;
@@ -656,9 +770,10 @@ Visible-thread rule:
   1. run the cheap lane/bootstrap worker if needed;
   2. write or refresh a lane-local handoff doc;
   3. return the branch, worktree, result-path, handoff-doc path, and lock details;
-  4. return a minimal copy/paste `bootstrap_wait` handoff prompt for the intended
-     execution model. It must remain read-only until the coordinator can bind
-     the actual task id and explicitly activate it.
+  4. return a minimal copy/paste handoff prompt for the intended execution model.
+     The coordinator must select a real owner; that receiver verifies the
+     factual lane and prior writer shutdown before writing. No invented
+     activation service or optional telemetry gate is required.
 
 Coordinator heartbeat rule for visible execution lanes:
 
@@ -806,9 +921,9 @@ safe execution step. Do not report a slice or lane final until its AC is fully
 proven/reviewed/committed and retirement-clean, or a genuine external/human
 blocker remains after all safe work is exhausted.
 
-## Exit Criteria
+## Exit Criteria (Full mode)
 
-Do not call an SDLC run complete until:
+Light/Defect use their completion criteria above. Full must not be called complete until:
 
 - the checklist reflects every required gate
 - planning artifacts are current
@@ -816,7 +931,9 @@ Do not call an SDLC run complete until:
 - slice commits exist for completed implementation slices
 - the final clean-code retirement slice is completed or explicitly marked not
   needed with an inventory-based rationale
-- worktree/lane closeout is recorded or explicitly marked not applicable
+- worktree/lane closeout proves directory and Git registration absent, is
+  not applicable, or records an intentional retained reason and next owner;
+  a deletion failure is cleanup blocked and cannot be called completed closeout
 - any canonical/shared repo root checkout is verified clean, on `main`,
   tracking `origin/main`, and updated only by fetch/pull from `origin/main`;
   any root checkout branch drift or dirty task-owned file is recorded as a
@@ -838,7 +955,7 @@ Use this skill for prompts like:
 - `Run the full prerelease planning and slice implementation loop.`
 - `Coordinate the SDLC wave and keep the gates/checklist honest.`
 
-## Automatic semantic phase movement
+## Automatic semantic phase movement (Full mode)
 
 When the consuming repo exposes a documented semantic phase-transition
 entrypoint, invoke it once after each accepted refinement phase and clean slice

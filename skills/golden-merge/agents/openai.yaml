@@ -1,4 +1,4 @@
 interface:
   display_name: "Golden Merge"
   short_description: "Merge reviewed work to main safely."
-  default_prompt: "Use $golden-merge to merge this reviewed branch to main with the correct golden or non-golden closeout path."
+  default_prompt: "Use $golden-merge for authorized closeout after independent LLM code/architecture/cleanup review and verified acceptance; accept the Light/Defect compact packet and preserve the repo PR and protected-root safeguards."

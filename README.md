@@ -1,6 +1,6 @@
 # SDLC Skills
 
-Reusable agent skills for phase-gated product refinement, planning, implementation, review, clean-code retirement, and verification.
+Reusable agent skills for Full product SDLC, explicit Light additions, and explicit Defect repairs, with independent LLM review, outcome proof, and verified closeout.
 
 This repository is intended to stay generic and safe to publish. Project-specific details belong in the consuming repository's local agent instructions, not in these shared skills.
 
@@ -10,19 +10,34 @@ Copyright is retained by the repository owner. This repository is public for ins
 
 ## Design
 
-`skills/sdlc` is intentionally a lightweight orchestrator. When invoked, it must create and follow an explicit checklist, load the correct narrower skill before each phase, and enforce confirmation, review, documentation, AC signoff, clean-code retirement, verification, and commit gates.
+`skills/sdlc` coordinates the selected mode, creates its checklist, and loads the
+correct narrower skills. Full is the default, including legacy packets without a
+mode. Light/Defect require explicit selection or an accepted continuation packet;
+a bug report alone does not silently select Defect.
+
+Light covers one small addition in established architecture. Defect covers one
+observed failure with established expected behavior. Each uses one compact
+AC/proof packet, a direct owner, combined independent LLM code/architecture/cleanup
+review, targeted proof, and reviewer evidence inspection. Full retains phased
+refinement, planning, traceability, matrices, and planned retirement.
+
+Humans confirm new or materially changed AC and support unresolved
+product/design/architecture decisions. Accepted instructions or artifacts satisfy
+confirmation. Human code review and routine implementation approval are not
+required gates. All modes retain repo safety, provider authorization, truthful
+outcome proof, and authorized external-action boundaries.
 
 The detailed phase behavior lives in the subskills. The orchestrator should not perform requirements discovery, planning, implementation, or review from memory.
 
 ## Contents
 
-- `skills/sdlc` coordinates the full workflow, checklist, gates, and subskill loading.
+- `skills/sdlc` coordinates Full, Light, and Defect workflow, gates, and subskill loading.
 - `skills/requirements-discovery` refines problem statements and acceptance criteria.
 - `skills/refactor-health` runs the Phase 0 architecture-fit check.
 - `skills/functional-plan`, `skills/technical-plan`, and `skills/execution-plan` create reviewed planning artifacts.
 - `skills/slice-implement` and `skills/slice-review` run one reviewed implementation slice at a time.
-- `skills/sdlc-state` maintains compact resumable execution state.
-- `skills/implement` resumes an already approved wave at implementation.
+- `skills/sdlc-state` indexes the selected mode; bounded work may use its packet.
+- `skills/implement` executes an accepted Full plan or explicit Light/Defect packet.
 - `skills/worktree-setup` discovers project setup and protects shared checkouts.
 - `skills/lane-bootstrap` prepares isolated lanes and compact owner handoffs.
 - `skills/golden-merge` closes reviewed work through the project's merge policy;
@@ -31,16 +46,23 @@ The detailed phase behavior lives in the subskills. The orchestrator should not 
 
 ## Active Rules Refresh
 
-The shared bundle was compared with the active installed skills and refreshed
-on 2026-10-08. All nine existing skills and their UI metadata were updated; the
-four workflow dependencies listed above were added. The source-selection
-reference remains bundled with the orchestrator.
+The shared bundle and UI prompts were refreshed on 2026-10-13 from the reviewed
+Full/Light/Defect workflow and cleanup repair. Full-only artifacts stay scoped to
+Full. Bounded work uses compact proof rows and inline cleanup, without a separate
+planning bench, execution task, retirement slice, or heartbeat solely for its mode.
 
-The refreshed workflow includes external-practice research and AC-evidence
-classification, a bounded defect fast path, compact independent review packets,
-batched review fixes, explicit slice ownership and handoff rules, affected-boundary
-verification with honest evidence reuse, and optional nonblocking telemetry.
-Final behavior-level AC signoff and clean-code retirement gates remain required.
+Code-review CLEAN and acceptance pending/verified remain separate. CLEAN permits
+targeted verification; green completion or merge requires inspected outcome proof
+and explicit architecture/cleanup CLEAN. Handoffs use factual identity, prior
+writer shutdown, and any currently supported ownership protocol. Optional
+retrieval/telemetry and retired bootstrap machinery cannot gate them.
+
+All modes distinguish code cleanup from filesystem cleanup. Routine completed
+merged worktrees are removed through the consuming repo's maintained entrypoint.
+Verify both directory and Git-registration absence; incomplete deletion is
+blocked, not successful telemetry. Use only supported safe retry/recovery. Record
+removed/not-applicable, or a precise retained/blocked reason, next action, and
+owner in the existing result. Orphan inventory alone never authorizes deletion.
 
 The shared versions intentionally adapt local rules for reuse:
 
@@ -69,8 +91,9 @@ Do not overwrite the installed copies as part of maintaining this repository.
    provider-test or deployment exceptions.
 4. Mark absent lane, database, retrieval, telemetry, or phase utilities as
    unavailable or not applicable. Optional diagnostics are not prerequisites.
-5. Invoke `$sdlc` for refinement and planning, or `$implement` only after the
-   reviewed execution plan is accepted.
+5. Invoke `$sdlc` for default Full refinement/planning, `$sdlc light` for a bounded
+   addition, or `$sdlc defect` for an established-behavior repair. `$implement`
+   accepts the selected mode's approved plan or compact packet.
 
 The current workflow uses `main` and `origin/main` as its baseline convention.
 Projects with another default branch or remote must document the equivalent
@@ -78,9 +101,17 @@ mapping before use.
 
 ## Quality Gates
 
-The workflow treats AC traceability and AC signoff as separate gates. Execution plans must include a trace table for planned coverage and a final AC verification matrix for behavior-level proof, proof depth, reviewer signoff status, and deferred/unchecked notes.
+Full treats AC traceability and AC signoff as separate gates, with execution-plan
+trace rows and a final behavior-level AC matrix. Light/Defect use one compact
+AC/proof table with expected outcomes, proof boundaries, evidence, and disposition.
+Missing Full-only documents are not findings for bounded work.
 
-Every implementation wave must also include a terminal clean-code retirement slice unless the execution plan explicitly records that it is not needed after checking the full inventory. That retirement slice covers unused or deprecated code, unreachable branches, duplicate implementations, compatibility shims, DB/schema/data objects, migrations or seed data, images/media/assets, tests, docs, scripts, config flags, dependencies, generated files, debug output, and failed-attempt work introduced or made obsolete by the wave. Reviewers should treat leftover unused/deprecated surfaces as blocking unless the plan explicitly retains them with a product or technical reason.
+Full waves include a terminal retirement slice unless their plan records an
+inventory-based reason it is not needed. Light/Defect remove introduced or
+obsoleted leftovers inline and review cleanup in the final diff. In every mode,
+unneeded code, data, assets, tests, docs, scripts, flags, dependencies, generated
+files, debug output, and failed-attempt work require removal or explicit retention
+with a concrete reason. Disk cleanup is a separate truthful closeout outcome.
 
 ## Public Skill Boundary
 

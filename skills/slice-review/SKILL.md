@@ -1,9 +1,37 @@
 ---
 name: slice-review
-description: Review exactly one slice for prerelease product work. Use when the user wants a combined slice review for a current slice diff or slice commit, with findings resolved before broad verification and before the next risky slice begins.
+description: "Independently review one Full slice or Light/Defect compact change. Check correctness, architecture, cleanup, and outcome AC, reporting code-review status separately from acceptance proof."
 ---
 
 # Slice Review
+
+## Mode-specific packet and two verdicts
+
+Full is the default. Light/Defect accept `$sdlc`'s compact packet with scope,
+accepted outcome/negative/technical checks, proof boundaries, affected seam,
+guardrails, verification status, and cleanup expectations. It replaces separate
+plan excerpts, trace rows, and final matrices everywhere below. Missing a Full-only
+artifact is not a finding; missing expected behavior or proof depth is.
+
+The independent LLM reviewer combines correctness, AC drift, architecture
+conformance, and cleanup for bounded work. No separate refinement bench or human
+code reviewer is required. Full retains its planned refinement/acceptance roles.
+Humans confirm AC or assist with unresolved design/architecture decisions.
+
+Return code-review and acceptance as separate verdicts in every mode:
+
+- `code_review: CLEAN | FINDINGS` for the diff, architecture, and cleanup;
+- `acceptance: pending | verified | partial | blocked` for required outcome proof;
+- `architecture_conformance: CLEAN | FINDINGS` and `cleanup: CLEAN | FINDINGS`.
+
+Code-review CLEAN with acceptance pending permits targeted verification only.
+Unrun planned proof is pending, not a blocking code finding. Failed proof or
+insufficient completed proof remains blocked/partial. Never sign off unproven
+AC, merge, or call the change green from code-review CLEAN alone. After targeted
+checks, inspect the evidence summary with the same reviewer; this evidence
+follow-up does not restart full diff review unless a material fix changed it.
+The final verdict binds the final diff/commit and proves each required AC at
+its boundary. Preserve all applicable provider/genericity/domain-authority checks.
 
 Use this skill only after a coherent slice diff or slice commit exists.
 
@@ -33,10 +61,9 @@ needs it, the local path or repository-relative path to this skill.
   unless a failure or uncertainty specifically requires that expansion
 - run one combined review focused on correctness, AC drift, maintainability, and
   whether the slice still matches the approved plan and architecture intent
-- validate the slice against the supplied compact AC/TAC packet and the supplied
-  final AC verification matrix rows
-- verify each assigned AC row at the proof depth named in the final AC
-  verification matrix before calling that row signed off
+- validate the slice against its supplied AC/TAC packet and mode-specific proof
+  record: Full's final matrix or Light/Defect's single compact AC/proof table
+- verify each assigned AC at its named proof depth before signing it off
 - block the review when the AC/TAC packet is missing or too vague to validate
 - when a slice touches LLM-facing prompts, contracts, manifests, structured-output
   tests, validators, deterministic field assembly, or provider-visible payload shaping,
@@ -62,14 +89,16 @@ needs it, the local path or repository-relative path to this skill.
   for provider execution. If a review fix changes provider-visible behavior,
   require the affected diagnostic and unseen live proof again; if it changes
   generator, hydration, oracle, or test definition, require a new unseen group.
-- compare the available proof to the exact expected behavior row by row before
-  signoff; if the evidence proves only intermediate mechanics, return `partial`
-  or `blocked`
+- compare available proof to expected behavior row by row before acceptance
+  signoff; intermediate-only proof is partial/blocked, while planned unrun proof
+  is pending and does not prevent an independent code-review verdict
 - mark AC coverage `partial` or `blocked` when the proof validates only
   intermediate implementation behavior rather than the promised outcome
-- mark the review `blocked` when the packet is missing owned AC rows, required
-  proof depth, proof evidence, or the later gate allowed to close a partial row
-- do not convert `pending verification` into `review clean`
+- mark acceptance blocked when owned AC, proof depth, or the later gate for a
+  partial row is missing. Before planned checks run, mark proof evidence pending;
+  do not block code review solely because targeted verification comes next
+- do not convert pending verification into acceptance verified or overall
+  completion; code-review CLEAN may explicitly coexist with acceptance pending
 - validate the slice against its clean-code retirement expectation; leftovers
   introduced or made obsolete by the wave are blocking unless the plan
   explicitly retains them with a reason
@@ -87,14 +116,14 @@ Use the lightest review mode that still protects correctness.
   and top findings only
 - `DEEP`: expanded context, stronger architecture or contract validation, and a
   broader correctness sweep
-- `ACCEPTANCE`: full acceptance-criteria validation using the final AC
-  verification matrix, architecture review, correctness sweep, and UX review
+- `ACCEPTANCE`: outcome acceptance using the mode-specific AC/proof record,
+  architecture review, correctness sweep, and UX review
   when applicable
 - `CLEANUP`: terminal clean-code retirement review; validates removals,
   no-reference proof, no supported-behavior regression, and no broad unrelated
   cleanup beyond the plan
 
-`ACCEPTANCE` review at the end of the full slice wave must use two separate
+In Full mode, end-of-wave `ACCEPTANCE` review must use two separate
 reviewers:
 
 - one architect reviewer
@@ -124,7 +153,8 @@ Escalate from `SHALLOW` to `DEEP` or early `ACCEPTANCE` when:
 - the slice is materially UX-facing and shallow review cannot validate it
 - repeated findings suggest a broader issue set
 - any assigned AC row requires `behavior/API/service`, `visual`, or `manual`
-  proof and the evidence does not directly prove that outcome yet
+  proof and completed evidence does not directly prove that outcome; planned
+  unrun proof is pending and does not alone force deeper code review
 - any assigned AC crosses service/API, provider, persistence, FE/backend, auth,
   billing, notification, scheduler, sync, deployment, or other cross-module
   boundaries
@@ -171,21 +201,25 @@ Use cached context before requesting raw context.
 Use terse findings-only output by default.
 
 - always include one compact metadata line:
-  `scope: <diff-only|changed-files|expanded-to-contract>; model: <model>; AC coverage: <complete|partial|blocked|not applicable>; unchecked AC: <ids|none>; AC signoff: <signed-off|partial|blocked|deferred|not applicable>`
+  `scope: <diff-only|changed-files|expanded-to-contract>; model: <model>; workflow_mode: <full|light|defect>; code_review: <CLEAN|FINDINGS>; architecture_conformance: <CLEAN|FINDINGS>; cleanup: <CLEAN|FINDINGS>; acceptance: <pending|verified|partial|blocked>; AC coverage: <pending|complete|partial|blocked|not applicable>; unchecked AC: <ids|none>; AC signoff: <pending|signed-off|partial|blocked|deferred|not applicable>`
 - if AC coverage is `partial` or `blocked`, include a finding naming the
   uncovered row
+- use AC coverage `pending` for planned unrun proof; include unchecked IDs
+  without manufacturing a code finding for verification that comes next
 - if AC signoff is `partial` or `blocked`, include a finding naming the row and
   the gap between the evidence and the expected behavior
 - do not sign off outcome AC from route labels, helper return values, mocks,
   CSS selectors, local state labels, or object-shape checks
-- do not output `No findings.` when any assigned AC row is still unproven at its
-  required proof depth
+- `No code findings.` may accompany acceptance pending before planned proof.
+  Do not output an unqualified `No findings.` or acceptance verified while any
+  required AC remains unproven
 - for terminal clean-code retirement slices, include a finding for any leftover
   unused/deprecated code or non-code surface lacking an explicit retained reason
 - output bullet issues only
 - include no prose summary unless there are zero findings
-- if there are no findings, output the metadata line followed by exactly
-  `No findings.`
+- if code has no findings but planned proof is pending, output the metadata
+  followed by `No code findings; acceptance pending.` Once all required proof
+  is independently inspected, output the metadata followed by `No findings.`
 
 ## Sub-Agent Lifecycle
 
@@ -215,13 +249,13 @@ Every compact new reviewer prompt must include:
 - relevant plan excerpt
 - verification status
 - unresolved prior findings if relevant
-- assigned Product AC, Technical AC, Negative AC, trace rows, planned tests,
-  affected files, forbidden states, and expected AC coverage verdict
-- assigned final AC verification matrix rows, exact expected behavior, required
-  proof depth, current proof evidence, and requested signoff status
+- assigned Product/Technical/Negative AC, planned checks, affected files,
+  forbidden states, and expected coverage; trace rows apply only to Full
+- assigned mode-specific AC/proof rows, exact outcome, required proof depth,
+  current evidence, and requested signoff status
 - whether each assigned AC row closes now or remains partial for a named later
   gate
-- clean-code retirement expectation
+- cleanup expectation: inline for Light/Defect, planned retirement for Full
 - for LLM-facing slices, explicit review checks for provider-agnostic reusable
   source, no fixture/provider/test-case tuning in reusable wording, contract
   grammar minimization, and whether deterministic runtime assembly still owns
@@ -255,7 +289,7 @@ Record in the review result:
 - review model and reasoning effort
 - escalation reason, or `none`
 - AC coverage verdict
-- AC signoff verdict for matrix rows
+- AC signoff verdict for mode-specific proof rows
 - unchecked or deferred AC ids, or `none`
 - which assigned rows were proven at their required boundary versus which remain
   partial or blocked

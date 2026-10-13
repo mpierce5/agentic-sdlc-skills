@@ -1,4 +1,4 @@
 interface:
   display_name: "Lane Bootstrap"
   short_description: "Create a task lane and handoff doc."
-  default_prompt: "Use $lane-bootstrap to create or refresh a task branch/worktree lane and write the handoff doc for the next agent."
+  default_prompt: "Use $lane-bootstrap to prepare a factual lane and compact handoff only when ownership transfers; direct Light/Defect owners need no separate execution task."

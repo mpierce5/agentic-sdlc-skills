@@ -5,6 +5,21 @@ description: Create and review a slice-based execution plan for prerelease produ
 
 # Execution Plan
 
+## Mode scope and human review
+
+Full is the default. The separate phase workflow, phase reviews, document/matrix
+requirements, and phase commits below apply to Full. When `$sdlc` selects Light
+or Defect, capture only this phase's relevant outcome, affected-seam guardrails,
+and proof decisions in the single compact packet. Do not restart this standalone
+phase or create its separate artifacts/reviewer bench unless escalation to Full
+requires it. Follow `$sdlc`'s mode eligibility and shared safety rules.
+
+Humans confirm AC and resolve product/design/architecture questions the LLM
+cannot safely settle. Reuse already accepted AC from the user's instruction or
+approved artifact; ask again only for new, ambiguous, or materially changed AC.
+TPM/architect and code reviews are independent LLM reviews. Neither implementation
+nor routine closeout requires a human code-review or automatic approval gate.
+
 Use this skill after the functional and technical plans are reviewed.
 
 ## Rules
@@ -106,8 +121,9 @@ Routine review may stay cost-controlled through reused reviewers and compact
 context, but it may not be vague: the reviewer must validate the assigned AC/TAC
 rows before the slice can be called review-clean.
 
-A slice must not be called review-clean when any assigned AC row that is
-supposed to close in that slice still lacks proof at its required boundary.
+A code-review CLEAN verdict may precede targeted verification. A slice must not
+be called acceptance-verified, green, or complete when an AC row due to close
+still lacks independently inspected proof at its required boundary.
 Diff plausibility, helper tests, mocks, route labels, local state assertions,
 or intended architecture are not substitutes for required proof depth.
 
@@ -232,9 +248,10 @@ Each slice entry in the implementation-plan document must include:
 - task/lane routing: `serial-exclusive-lane-transfer` or
   `parallel-isolated-worktree`, including dependency and merge order. A serial
   transfer must define the exact reviewed/pushed head, clean-lane and prior
-  writer shutdown proof, exclusive lease release/acquisition, coordinator
-  registry plus activation-epoch rebinding, and compact handoff before writable
-  activation. Retrieval and telemetry diagnostics are optional and local
+  writer shutdown proof, named next owner/scope, and compact handoff before
+  writing. Include additional ownership/activation steps only if current repo
+  authority defines and supports them; never plan retired registry or lease
+  machinery. Retrieval and telemetry diagnostics are optional and local
 - optional local launch/telemetry diagnostics when supported; raw telemetry is
   gitignored and never a formal slice artifact. Lane id, slice id, and
   task/thread id remain separate identities
@@ -268,8 +285,9 @@ Each slice entry in the implementation-plan document must include:
 - AC signoff packet to pass: final matrix rows owned or preserved by the slice,
   required proof depth, and whether available tests prove outcome behavior or
   only intermediate behavior
-- review-clean rule: the reviewer must block the slice if any row marked `close
-  in this slice` lacks proof at its required boundary
+- review-status rule: code-review CLEAN permits targeted verification; acceptance
+  remains pending until rows marked `close in this slice` have proof at their
+  required boundaries inspected by the reviewer
 - review mode plan: `SHALLOW` by default, explicit `DEEP` triggers, and whether
   this slice contributes to a later `ACCEPTANCE` gate
 - if this is the final end-of-wave `ACCEPTANCE` gate, name the two required
