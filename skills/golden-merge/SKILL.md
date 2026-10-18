@@ -153,6 +153,12 @@ Run this sequence:
 
 ## Lane Retirement
 
+Apply `$worktree-setup`'s standing authority for finished lanes: an authorized
+cleanup agent may retire another agent's completed lane after proving its current
+merged identity, no active owner/handoff, and no needed unsaved/local artifacts.
+The original writer's absence is not a cleanup blocker when these facts are
+independently established. Record ambiguity as retention, not deletion permission.
+
 Retire after the reviewed task head was merged through the repo-approved PR path,
 its pre-merge signoff is included, and the protected root has synchronized to the
 resulting integration head. Record factual post-merge
@@ -171,9 +177,10 @@ Before removal, prove all of the following:
 - the target worktree has no tracked or untracked task changes;
 - no worker or reviewer still needs the lane for a same-slice fix or review.
 
-The same slice owner runs retirement from a working directory outside the
-target worktree. Do not remove the current process directory. No coordinator
-takeover or new cleanup lane is required. A protected root may issue the
+The slice owner normally runs retirement; an authorized cleanup agent may do
+so under the standing authority above. Either runs from outside the target
+worktree. Do not remove the current process directory. No coordinator takeover
+or new cleanup lane is required. A protected root may issue the
 maintained closeout/Git maintenance commands without task-owned edits.
 
 Use this order:

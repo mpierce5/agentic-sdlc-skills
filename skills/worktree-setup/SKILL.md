@@ -165,6 +165,31 @@ when the user explicitly approves it for that task.
 
 ## Closeout
 
+### Standing authority for finished lanes
+
+When the user or consuming repo authorizes cleanup of finished worktrees, that
+authority includes a lane completed by another agent. A cleanup agent need not
+be its original writer and need not request routine approval again. It may
+inspect and retire a specific lane once the checks below establish disposal:
+current branch/head match the completed result and merged PR (including the
+verified squash/rebase alternative), no live worker/reviewer or planned handoff
+needs it, and no unsaved tracked/untracked work or needed ignored/local-only
+artifacts remain. Inspect ignored contents for needed captures, fixtures or
+handoffs; dependency installs, build output and disposable caches may be removed
+with an otherwise eligible lane.
+
+A completed/idle chat, old timestamp, closed issue, stale observation, or branch
+name alone does not prove these facts. If the original writer is unavailable,
+use durable result/PR and current task/Git/filesystem evidence; ambiguous
+ownership or unsaved work means retain with a concrete next action and owner.
+Stop only known lane-owned processes. Use the maintained exact-target closeout
+command from outside the target and verify directory and registration absence.
+Do not stop active unrelated work, delete protected checkouts, force-delete
+unmerged branches, or infer orphan-deletion authority from inventory. Unregistered
+leftovers require supported identity-checked recovery or a separately reviewed
+exact-target disposal plan. Keep the concise outcome in the existing result/PR.
+
+
 Before final SDLC closeout, stop only task-owned servers/watchers and other
 resources holding its worktree open, then clean through the repo command.
 All modes record a factual worktree disposition in the existing result:
