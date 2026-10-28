@@ -5,6 +5,11 @@ description: "Independently review one Full slice or Light/Defect compact change
 
 # Slice Review
 
+Agent routing: Independent review at the adapter's review model and effort.
+Resolve concrete model and effort through the active platform adapter or explicit
+task/repo policy. See the shared [routing policy](../sdlc/SKILL.md#model-and-agent-policy);
+helper loading retains the existing owner/model.
+
 ## Mode-specific packet and two verdicts
 
 Full is the default. Light/Defect accept `$sdlc`'s compact packet with scope,
@@ -134,10 +139,12 @@ reviewers:
 Resolve concrete models and reasoning through the active platform adapter or
 repo-local policy. Use `economy-review` for bounded routine review,
 `standard-review` for cross-file or contract risk, and `frontier-review` for
-high-risk or ambiguous architecture judgment. Record the actual assignment and
-escalate when the assigned reviewer cannot reliably resolve the issue.
+high-risk or ambiguous architecture judgment. These scope aliases may map to
+the same concrete model and effort; follow the adapter's mapping rather than
+inferring a price tier from the name. Record the actual assignment and increase
+review depth/context when the reviewer cannot reliably resolve the issue.
 
-Escalate when the slice touches auth, permissions, privacy, payments,
+Increase review depth and context when the slice touches auth, permissions, privacy, payments,
 notifications, scheduler, sync, deployment, environment variables, database
 shape, API contracts, production-facing integration wiring, architecture
 boundaries, shared data flow, persistence semantics, FE/backend contracts,

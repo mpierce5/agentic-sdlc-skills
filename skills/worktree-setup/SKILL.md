@@ -5,6 +5,11 @@ description: "Discover, select, verify, and close the correct branch/worktree/la
 
 # Worktree Setup
 
+Agent routing: Known-command setup; return unresolved ownership/setup ambiguity to the owner.
+Resolve concrete model and effort through the active platform adapter or explicit
+task/repo policy. See the shared [routing policy](../sdlc/SKILL.md#model-and-agent-policy);
+helper loading retains the existing owner/model.
+
 ## Workflow mode
 
 Full is the default. Light/Defect use `$sdlc`'s accepted compact packet as the

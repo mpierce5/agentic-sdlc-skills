@@ -5,6 +5,11 @@ description: Merge reviewed work to main using protected-root-safe closeout rule
 
 # Golden Merge
 
+Agent routing: Retain the slice owner's model through closeout; use the adapter's separate closeout default only for an actually separate assignment.
+Resolve concrete model and effort through the active platform adapter or explicit
+task/repo policy. See the shared [routing policy](../sdlc/SKILL.md#model-and-agent-policy);
+helper loading retains the existing owner/model.
+
 ## Workflow mode and reviewer authority
 
 Full is the default. Light/Defect use the accepted compact packet and its AC/proof

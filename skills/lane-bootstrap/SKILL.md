@@ -5,6 +5,11 @@ description: Create or refresh a task branch/worktree/lane and write the lane-lo
 
 # Lane Bootstrap
 
+Agent routing: Known-command bootstrap; select the successor's profile separately from its accepted scope.
+Resolve concrete model and effort through the active platform adapter or explicit
+task/repo policy. See the shared [routing policy](../sdlc/SKILL.md#model-and-agent-policy);
+helper loading retains the existing owner/model.
+
 ## Workflow mode
 
 Full is the default. Light/Defect use `$sdlc`'s accepted compact packet as the

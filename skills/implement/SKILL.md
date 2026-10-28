@@ -5,6 +5,11 @@ description: "Execute an approved Full SDLC plan or an explicitly selected Light
 
 # Implement
 
+Agent routing: Wave coordination; a direct slice owner retains its selected implementation profile.
+Resolve concrete model and effort through the active platform adapter or explicit
+task/repo policy. See the shared [routing policy](../sdlc/SKILL.md#model-and-agent-policy);
+helper loading retains the existing owner/model.
+
 ## Workflow mode and authorization
 
 Full is the default when neither the user nor accepted continuation packet names

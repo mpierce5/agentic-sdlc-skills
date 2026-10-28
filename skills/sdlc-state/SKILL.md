@@ -5,6 +5,11 @@ description: "Maintain a compact execution index for Full, Light, or Defect SDLC
 
 # SDLC State
 
+Agent routing: Factual index maintenance only; do not infer acceptance or review verdicts.
+Resolve concrete model and effort through the active platform adapter or explicit
+task/repo policy. See the shared [routing policy](../sdlc/SKILL.md#model-and-agent-policy);
+helper loading retains the existing owner/model.
+
 ## Mode-aware state
 
 Full is the default; missing `workflow_mode` in legacy state means `full`. Add

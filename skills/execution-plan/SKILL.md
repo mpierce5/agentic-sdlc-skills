@@ -5,6 +5,11 @@ description: Create and review a slice-based execution plan for prerelease produ
 
 # Execution Plan
 
+Agent routing: Dependency, ownership and execution planning.
+Resolve concrete model and effort through the active platform adapter or explicit
+task/repo policy. See the shared [routing policy](../sdlc/SKILL.md#model-and-agent-policy);
+helper loading retains the existing owner/model.
+
 ## Mode scope and human review
 
 Full is the default. The separate phase workflow, phase reviews, document/matrix
@@ -212,20 +217,20 @@ canonical/shared root checkout.
 
 Use this model policy for refinement-wave execution-plan review:
 
-- TPM refinement reviewer: `frontier-review`, medium or high reasoning
-- architect refinement reviewer: `frontier-review`, medium or high reasoning
+- TPM refinement reviewer: `frontier-review`, adapter-defined model and reasoning
+- architect refinement reviewer: `frontier-review`, adapter-defined model and reasoning
 - reuse the same refinement-wave TPM and architect reviewers by default across
   execution-plan iterations
 
 Use this model policy when writing slice review steps:
 
-- routine slice code review: `economy-review`, medium reasoning
+- routine slice code review: `economy-review`, adapter-defined model and reasoning
 - medium-risk architecture, contract, or cross-file review: `standard-review`,
-  medium or high reasoning
+  adapter-defined model and reasoning
 - high-risk review or ambiguous architecture judgment: `frontier-review`,
-  medium or high reasoning
+  adapter-defined model and reasoning
 
-Escalate the planned review model when a slice touches auth, permissions,
+Increase planned review depth and context when a slice touches auth, permissions,
 privacy, payments, notifications, scheduler, sync, deployment, environment
 variables, database shape, API contracts, production-facing integration wiring,
 architecture boundaries, shared data flow, persistence semantics, FE/backend
@@ -270,8 +275,8 @@ Each slice entry in the implementation-plan document must include:
 - Phase 0 hotspot touched, or `none`
 - architecture-health expectation: reduce responsibility, extract, split,
   delete obsolete path, no-growth containment, or `not applicable`
-- whether an economy-tier reviewer may request a follow-up `standard-review` or
-  `frontier-review`
+- whether the same reviewer needs deeper context or a follow-up review pass;
+  aliases may share the same model and do not require additional agents
 - review-agent lifecycle: reuse same-run reviewer by default, or the reason a
   fresh reviewer is required
 - whether reviewers stay open for same-slice fixes and re-review

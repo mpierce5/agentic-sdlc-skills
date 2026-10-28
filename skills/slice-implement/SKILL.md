@@ -5,6 +5,11 @@ description: "Implement one approved Full execution-plan slice or accepted Light
 
 # Slice Implement
 
+Agent routing: Bounded implementation; harder bounded work may use higher effort, while new capability/architecture uses the design profile.
+Resolve concrete model and effort through the active platform adapter or explicit
+task/repo policy. See the shared [routing policy](../sdlc/SKILL.md#model-and-agent-policy);
+helper loading retains the existing owner/model.
+
 ## Mode-specific input and review status
 
 Full is the default and uses the reviewed execution plan. Light/Defect use the

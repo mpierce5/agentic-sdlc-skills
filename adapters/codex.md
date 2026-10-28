@@ -39,19 +39,51 @@ For routine review, spawn reviewers without full-context forking. Pass compact c
 
 ## Model Tier Mapping
 
-Choose concrete models according to availability in the current Codex environment.
+Explicit user, accepted task, and consuming-repo routing override these defaults.
+Resolve the actual assigned role rather than giving every phase the same model.
 
-- `economy-review`: cheapest model that can reliably perform diff-first review
-- `standard-review`: stronger model for cross-file, contract, or architectural review
-- `frontier-review`: strongest available model for refinement, high-risk review, or hard debugging
+| Skill / assigned role | Model | Reasoning |
+| --- | --- | --- |
+| `sdlc` coordinator | `gpt-6.1-sol` | `medium` |
+| `requirements-discovery` | `gpt-6.1-sol` | `medium` |
+| `refactor-health` assessment owner | `gpt-6.1-sol` | `medium` |
+| `functional-plan` | `gpt-6.1-terra` | `medium` |
+| `technical-plan` | `gpt-6.1-sol` | `medium` |
+| `execution-plan` | `gpt-6.1-sol` | `medium` |
+| `implement` wave coordinator | `gpt-6.1-sol` | `medium` |
+| `slice-implement` bounded implementation | `gpt-6.1-terra` | `medium` |
+| `slice-review`, independent TPM, architecture, acceptance and cleanup reviews | `gpt-6.1-sol` | `high` |
+| `sdlc-state` separately assigned factual index maintenance | `gpt-6-luna` | `medium` |
+| `worktree-setup`, `lane-bootstrap` separately assigned setup | `gpt-6-luna` | `medium` |
+| `golden-merge` separately assigned closeout | `gpt-6.1-terra` | `medium` |
+| `worktree-setup-template` | `gpt-6.1-terra` | `medium` |
 
-Record the concrete model used in the planning/progress artifact when review independence matters.
+Use `gpt-6.1-terra` / `high` for harder bounded implementation within accepted
+contracts. Use `gpt-6.1-sol` / `medium` for a genuinely new capability,
+architecture decision, or materially ambiguous functional behavior. Terra may
+gather bounded Phase 0 inventory; Sol owns assessment and decisions. Luna setup
+follows known repo commands and returns unresolved ownership/setup ambiguity to
+the owner. Luna state maintenance records established facts, never acceptance
+or review verdicts inferred from activity.
 
-Concrete model names and reasoning come from the current host's exposed model
-list and consuming-repo routing policy. Do not retain historical model names as
-launch defaults. If required routing is unavailable, follow the host's escalation
-policy rather than silently substituting another tier. Risk alone does not
-require the most expensive model when the documented review model is sufficient.
+All three review aliases (`economy-review`, `standard-review`, `frontier-review`)
+default to `gpt-6.1-sol` / `high`. Risk changes review depth and context, not the
+default model or required reviewer count. Reuse the required reviewers. Astra
+requires a recorded exceptional reason and user approval.
+
+Loading a helper skill does not switch the current model or require a new task.
+A direct slice owner retains its selected model through `implement`, setup,
+state maintenance, and its own `golden-merge` closeout. Separate helper defaults
+apply only when that role is actually assigned separately; do not introduce an
+extra worker just to obtain a cheaper helper profile.
+
+For every separately created or resumed worker, select the model for its actual
+remaining scope and pass exact model and reasoning in the task-control fields.
+Check returned routing when available and record the assignment in the existing
+packet. If required routing is unavailable, report the blocker rather than
+silently falling back. Preserve explicit task exceptions and healthy ownership;
+do not restart completed proof to refresh model identity. These are execution
+agent choices, independent of provider-test models and authorization.
 
 Human review concerns AC and unresolved product/design/architecture decisions.
 An unavailable LLM reviewer is a tooling blocker, not a mandatory human

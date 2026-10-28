@@ -5,6 +5,11 @@ description: "Coordinate the human-directed SDLC workflow in Full (default), exp
 
 # SDLC
 
+Agent routing: Coordination.
+Resolve concrete model and effort through the active platform adapter or explicit
+task/repo policy. See the shared [routing policy](#model-and-agent-policy);
+helper loading retains the existing owner/model.
+
 ## Workflow mode and human involvement
 
 Full is the default. Select Light only when the user explicitly requests Light,
@@ -710,15 +715,29 @@ by the active adapter or repo-local instructions:
 - `standard-review`
 - `frontier-review`
 
-Default routing comes from the active platform adapter or repo-local policy:
+Explicit user, accepted task, and consuming-repo routing override the active
+platform adapter's defaults. For Codex, use the concrete per-skill table in
+[the Codex adapter](../../adapters/codex.md#model-tier-mapping).
 
-- use a lower-cost capable model for bounded lane/bootstrap work;
+- route by the actual assignment: factual setup/state, bounded implementation,
+  capability/architecture design, coordination, or independent review;
 - use the documented execution model and reasoning for writable slice owners;
-- map routine review to `economy-review` and escalate to `standard-review` or
-  `frontier-review` when risk or reviewer uncertainty requires it;
+- review aliases describe scope; their concrete model and effort come from the
+  adapter. Increase review depth/context for risk without automatically adding
+  a new reviewer or upgrading to the most expensive model;
 - keep repository provider-test policy separate from execution-agent routing.
   Required providers, optional comparisons, admission rules, and paid-test
   limits come from the consuming repo and accepted plan.
+
+Helper skill loading retains the current owner/model and does not require a new
+task. A direct slice owner keeps its selected profile through execution wrappers,
+setup, factual state maintenance, and its own merge closeout. Separate helper
+defaults apply only to actually separate assignments. Select routing for both
+new workers and resumptions from the remaining scope, preserving explicit task
+exceptions and healthy ownership. Pass exact model and reasoning through the
+task-control fields when supported, check returned routing when available, and
+report unavailable required routing rather than silently substituting a model.
+These defaults do not themselves authorize task creation or ownership transfer.
 
 The implementation agent must not be the only reviewer of its own work. If
 independent LLM review tooling is unavailable, use a separate fresh LLM reviewer

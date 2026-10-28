@@ -40,6 +40,7 @@ The detailed phase behavior lives in the subskills. The orchestrator should not 
 - `skills/implement` executes an accepted Full plan or explicit Light/Defect packet.
 - `skills/worktree-setup` discovers project setup and protects shared checkouts.
 - `skills/lane-bootstrap` prepares isolated lanes and compact owner handoffs.
+- `skills/worktree-setup-template` authors a consuming project's setup skill.
 - `skills/golden-merge` closes reviewed work through the project's merge policy;
   specialized golden rules apply only when the consuming project defines them.
 - `adapters/` maps generic workflow terms to a specific agent platform.
@@ -68,7 +69,7 @@ The shared versions intentionally adapt local rules for reuse:
 
 | Active local detail | Shared location or behavior |
 | --- | --- |
-| Concrete agent models and reasoning | Platform adapter or consuming-repo routing policy |
+| Concrete agent models and reasoning | Per-skill defaults in the platform adapter; explicit task/consuming-repo routing overrides |
 | Lane provisioning, binding, phase, and cleanup script names | Discover documented consuming-repo entrypoints |
 | Required provider and paid qualification policy | Accepted plan and consuming-repo provider authority |
 | Provider-specific deployment exceptions | Apply only explicit consuming-repo exceptions |
@@ -139,7 +140,14 @@ The skills use portable model tiers instead of provider-specific model names:
 - `standard-review`: medium-risk architecture, contract, or cross-file review
 - `frontier-review`: refinement reviews, hard debugging, broad refactors, and high-correctness-risk reviews
 
-Map those tiers in an adapter file or private local instructions.
+Map those scope aliases in an adapter file or private local instructions; they
+do not require different concrete models or extra reviewers. The
+[Codex adapter](adapters/codex.md#model-tier-mapping) defines the approved model
+and effort for all 14 shared skills, including distinct bounded implementation,
+design, coordination, review, and helper roles. Apply the mapping to both new
+assignments and worker resumptions. Loading a helper retains its current owner
+and model; it does not create another task. Provider-test model choices remain
+separate from execution-agent routing.
 
 ## Before Publishing
 

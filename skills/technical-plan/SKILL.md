@@ -5,6 +5,11 @@ description: Create and review the technical architecture and gap-analysis plan 
 
 # Technical Plan
 
+Agent routing: Architecture and technical design.
+Resolve concrete model and effort through the active platform adapter or explicit
+task/repo policy. See the shared [routing policy](../sdlc/SKILL.md#model-and-agent-policy);
+helper loading retains the existing owner/model.
+
 ## Mode scope and human review
 
 Full is the default. The separate phase workflow, phase reviews, document/matrix
